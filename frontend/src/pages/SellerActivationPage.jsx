@@ -1,12 +1,14 @@
 import axios from "axios";
 import React, { useEffect } from "react";
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams,useNavigate } from "react-router-dom";
 import { server } from "../server";
 
 const SellerActivationPage = () => {
   const { activation_token } = useParams();
   const [error, setError] = useState(false);
+  
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (activation_token) {
@@ -17,8 +19,10 @@ const SellerActivationPage = () => {
           })
           .then((res) => {
             console.log(res);
+            navigate("/shop-login");
           })
           .catch((err) => {
+            console.log(err);
             setError(true);
           });
       };

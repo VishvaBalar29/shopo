@@ -89,14 +89,17 @@ router.delete(
         const result = await cloudinary.v2.uploader.destroy(
           product.images[i].public_id
         );
-      }
-    
-      await product.remove();
-
-      res.status(201).json({
-        success: true,
-        message: "Product Deleted successfully!",
-      });
+      }   
+      // await product.remove();
+      const id = req.params.id;
+      const delProduct = await Product.deleteOne({_id : id});
+      if(delProduct){
+        console.log("Product Deleted Successfully");
+        res.status(201).json({
+          success: true,
+          message: "Product Deleted successfully!",
+        });
+      }     
     } catch (error) {
       return next(new ErrorHandler(error, 400));
     }

@@ -473,7 +473,8 @@ const ChangePassword = () => {
         { withCredentials: true }
       )
       .then((res) => {
-        toast.success(res.data.success);
+        // toast.success(res.data.success);
+        toast.success("Updated successfully");
         setOldPassword("");
         setNewPassword("");
         setConfirmPassword("");
