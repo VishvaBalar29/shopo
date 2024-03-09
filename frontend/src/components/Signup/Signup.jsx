@@ -13,6 +13,10 @@ const Singup = () => {
   const [password, setPassword] = useState("");
   const [visible, setVisible] = useState(false);
   const [avatar, setAvatar] = useState(null);
+  const [nameError, setNameError] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [avatarError, setAvatarError] = useState("");
 
   const handleFileInputChange = (e) => {
     const reader = new FileReader();
@@ -28,6 +32,34 @@ const Singup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (!name.trim()) {
+      setNameError("Name is required");
+    } else {
+      setNameError("");
+    }
+    if (!email.trim()) {
+      setEmailError("Email is required");
+    }
+    else if (!/\S+@\S+\.\S+/.test(email)){
+      setEmailError("Invalid Email Format");
+    } 
+    else {
+      setEmailError("");
+    }
+    if (!password.trim()) {
+      setPasswordError("Password is required");
+    } else if (!/(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-zA-Z]).{6,}/.test(password)) {
+      setPasswordError("Password must contain at least one digit, one special character, and one letter, and be at least 6 characters long");
+    } else {
+      setPasswordError("");
+    }
+    if (!avatar) {
+      setAvatarError("Please selete Your Profile Pic");
+    }else {
+      setAvatarError("");
+    }
+
 
     axios
       .post(`${server}/user/create-user`, { name, email, password, avatar })
@@ -39,7 +71,7 @@ const Singup = () => {
         setAvatar();
       })
       .catch((error) => {
-        toast.error(error.response.data.message);
+        // toast.error(error.response.data.message);
       });
   };
 
@@ -55,7 +87,7 @@ const Singup = () => {
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
               <label
-                htmlFor="email"
+                htmlFor="name"
                 className="block text-sm font-medium text-gray-700"
               >
                 Full Name
@@ -65,11 +97,13 @@ const Singup = () => {
                   type="text"
                   name="text"
                   autoComplete="name"
-                  required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
+                {nameError && (
+                  <p className="text-red-500 text-sm">{nameError}</p>
+                )}
               </div>
             </div>
 
@@ -85,11 +119,13 @@ const Singup = () => {
                   type="email"
                   name="email"
                   autoComplete="email"
-                  required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
+                 {emailError && (
+                  <p className="text-red-500 text-sm">{emailError}</p>
+                )}
               </div>
             </div>
 
@@ -105,11 +141,13 @@ const Singup = () => {
                   type={visible ? "text" : "password"}
                   name="password"
                   autoComplete="current-password"
-                  required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
+                {passwordError && (
+                  <p className="text-red-500 text-sm">{passwordError}</p>
+                )}
                 {visible ? (
                   <AiOutlineEye
                     className="absolute right-2 top-2 cursor-pointer"
@@ -155,9 +193,13 @@ const Singup = () => {
                     accept=".jpg,.jpeg,.png"
                     onChange={handleFileInputChange}
                     className="sr-only"
+                    
                   />
-                </label>
+                   </label>
               </div>
+                {avatarError && (
+                  <p className="text-red-500 text-sm">{avatarError}</p>
+                )}
             </div>
 
             <div>

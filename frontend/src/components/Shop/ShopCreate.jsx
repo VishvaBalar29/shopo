@@ -15,11 +15,64 @@ const ShopCreate = () => {
   const [zipCode, setZipCode] = useState();
   const [avatar, setAvatar] = useState();
   const [password, setPassword] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [nameError, setNameError] = useState("");
+  const [phoneNumberError, setPhoneNumberError] = useState("");
+  const [addressError, setAddressError] = useState("");
+  const [zipCodeError, setZipCodeError] = useState("");
+  const [avatarError, setAvatarError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
   const [visible, setVisible] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!email) {
+      setEmailError("Email is required");
+    }
+    else if (!/\S+@\S+\.\S+/.test(email)){
+      setEmailError("Invalid Email Format");
+    } 
+    else {
+      setEmailError("");
+    }
+    if (!name) {
+      setNameError("Name is required");
+    } else {
+      setNameError("");
+    }
+    if (!phoneNumber ) {
+      setPhoneNumberError("Phone Number is required");
+    }
+    else if (!/^\d{10}$/.test(phoneNumber)){
+      setPhoneNumberError("Please enter a valid 10-digit phone number");
+    } 
+    else {
+      setPhoneNumberError("");
+    }
+    if (!address) {
+      setAddressError("Address is required");
+    } else {
+      setAddressError("");
+    }
+    if (!zipCode ) {
+      setZipCodeError("Zipcode is required");
+    } else {
+      setZipCodeError("");
+    }
+    if (!password ) {
+      setPasswordError("Password is required");
+    } else if (!/(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-zA-Z]).{6,}/.test(password)) {
+      setPasswordError("Password must contain at least one digit, one special character, and one letter, and be at least 6 characters long");
+    } else {
+      setPasswordError("");
+    }
+    if (!avatar) {
+      setAvatarError("Please selete Your Profile Pic");
+    }else {
+      setAvatarError("");
+    }
+    console.log("hello");
     axios
       .post(`${server}/shop/create-shop`, {
         name,
@@ -41,9 +94,11 @@ const ShopCreate = () => {
         setPhoneNumber();
       })
       .catch((error) => {
-        toast.error(error.response.data.message);
+        // toast.error(error.response.data.message);
       });
   };
+
+  console.log(setPhoneNumberError);
 
   const handleFileInputChange = (e) => {
     const reader = new FileReader();
@@ -78,11 +133,13 @@ const ShopCreate = () => {
                 <input
                   type="name"
                   name="name"
-                  required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
+                {nameError && (
+                  <p className="text-red-500 text-sm">{nameError}</p>
+                )}
               </div>
             </div>
 
@@ -97,11 +154,13 @@ const ShopCreate = () => {
                 <input
                   type="number"
                   name="phone-number"
-                  required
                   value={phoneNumber}
                   onChange={(e) => setPhoneNumber(e.target.value)}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
+                {phoneNumberError && (
+                  <p className="text-red-500 text-sm">{phoneNumberError}</p>
+                )}
               </div>
             </div>
 
@@ -117,11 +176,13 @@ const ShopCreate = () => {
                   type="email"
                   name="email"
                   autoComplete="email"
-                  required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
+                {emailError && (
+                  <p className="text-red-500 text-sm">{emailError}</p>
+                )}
               </div>
             </div>
 
@@ -136,11 +197,13 @@ const ShopCreate = () => {
                 <input
                   type="address"
                   name="address"
-                  required
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
+                {addressError && (
+                  <p className="text-red-500 text-sm">{addressError}</p>
+                )}
               </div>
             </div>
 
@@ -155,11 +218,13 @@ const ShopCreate = () => {
                 <input
                   type="number"
                   name="zipcode"
-                  required
                   value={zipCode}
                   onChange={(e) => setZipCode(e.target.value)}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
+                {zipCodeError && (
+                  <p className="text-red-500 text-sm">{zipCodeError}</p>
+                )}
               </div>
             </div>
 
@@ -175,11 +240,13 @@ const ShopCreate = () => {
                   type={visible ? "text" : "password"}
                   name="password"
                   autoComplete="current-password"
-                  required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
+                {passwordError && (
+                  <p className="text-red-500 text-sm">{passwordError}</p>
+                )}
                 {visible ? (
                   <AiOutlineEye
                     className="absolute right-2 top-2 cursor-pointer"
@@ -227,6 +294,9 @@ const ShopCreate = () => {
                   />
                 </label>
               </div>
+              {avatarError && (
+                  <p className="text-red-500 text-sm">{avatarError}</p>
+                )}
             </div>
 
             <div>
