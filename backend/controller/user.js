@@ -108,7 +108,6 @@ router.post(
 
       if (!email || !password) {
         return next(new ErrorHandler("Please provide the all fields!", 400));
-        // console.log(new ErrorHandler("Please provide the all fields!", 400));
       }
 
       const user = await User.findOne({ email }).select("+password");
@@ -148,6 +147,7 @@ router.get(
         success: true,
         user,
       });
+      console.log(user);
     } catch (error) {
       return next(new ErrorHandler(error.message, 500));
     }
