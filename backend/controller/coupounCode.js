@@ -19,7 +19,7 @@ router.post(
       if (isCoupounCodeExists.length !== 0) {
         return next(new ErrorHandler("Coupoun code already exists!", 400));
       }
-
+      
       const coupounCode = await CoupounCode.create(req.body);
 
       res.status(201).json({
@@ -86,5 +86,21 @@ router.get(
     }
   })
 );
+
+router.get(
+  "/get-coupon",
+  catchAsyncErrors(async (req, res, next) => {
+    try {
+      const couponCode = await CoupounCode.find();
+
+      res.status(200).json({
+        success: true,
+        couponCode,
+      });
+    } catch (error) {
+      return next(new ErrorHandler(error, 400));
+    }
+  })
+)
 
 module.exports = router;

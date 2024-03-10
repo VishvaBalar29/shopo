@@ -116,7 +116,7 @@ const Singup = () => {
               </label>
               <div className="mt-1">
                 <input
-                  type="email"
+                  type="text"
                   name="email"
                   autoComplete="email"
                   value={email}

@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import axios from "axios";
+import { server } from "../../../server";
 import {
   AiFillHeart,
   AiFillStar,
@@ -20,14 +22,28 @@ import { addTocart } from "../../../redux/actions/cart";
 import { toast } from "react-toastify";
 import Ratings from "../../Products/Ratings";
 
-const ProductCard = ({ data,isEvent }) => {
+const ProductCard = ({ data, isEvent }) => {
   const { wishlist } = useSelector((state) => state.wishlist);
   const { cart } = useSelector((state) => state.cart);
   const [click, setClick] = useState(false);
   const [open, setOpen] = useState(false);
+  const [coupon,setCoupon] = useState([]);
   const dispatch = useDispatch();
 
   useEffect(() => {
+    axios
+      .get(
+        `${server}/coupon/get-coupon`, {
+          withCredentials: true,
+        })
+      .then((res) => {
+        // console.log(res.data.couponCode);
+        setCoupon(res.data.couponCode)
+        // console.log(coupon[0]);
+      })
+      .catch((error) => {
+        toast.error(error);
+      });
     if (wishlist && wishlist.find((i) => i._id === data._id)) {
       setClick(true);
     } else {
@@ -71,16 +87,31 @@ const ProductCard = ({ data,isEvent }) => {
             className="w-full h-[170px] object-contain"
           />
         </Link>
-        <Link to={`/shop/preview/${data?.shop._id}`}>
-          <h5 className={`${styles.shop_name}`}>{data.shop.name}</h5>
-        </Link>
+        <div className="d-flex flex-row" style={{display:"flex"}}>
+          <div className="">
+            <Link to={`/shop/preview/${data?.shop._id}`}>
+              <h5 className={`${styles.shop_name}`}>{data.shop.name}</h5>
+            </Link>
+          </div>
+          {
+            coupon.map((value) => {
+              if(data.name == value.selectedProducts){
+                return(
+                  <>
+                    <div className="pt-3 pb-3" style={{paddingLeft:"15px"}}><span style={{backgroundColor:"#e41f46",color:"white",padding:"4px 6px",borderRadius:"4px",fontSize:"13px"}}>Flat {value.value}% off</span></div>
+                  </>
+                )
+              }else{<></>}
+            })
+          }         
+          </div>
         <Link to={`${isEvent === true ? `/product/${data._id}?isEvent=true` : `/product/${data._id}`}`}>
           <h4 className="pb-3 font-[500]">
             {data.name.length > 40 ? data.name.slice(0, 40) + "..." : data.name}
           </h4>
 
           <div className="flex">
-          <Ratings rating={data?.ratings} />
+            <Ratings rating={data?.ratings} />
           </div>
 
           <div className="py-2 flex items-center justify-between">

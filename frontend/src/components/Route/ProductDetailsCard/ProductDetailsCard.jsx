@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { server } from "../../../server";
+import axios from "axios";
 import {
   AiFillHeart,
   AiOutlineHeart,
@@ -22,6 +24,7 @@ const ProductDetailsCard = ({ setOpen, data }) => {
   const dispatch = useDispatch();
   const [count, setCount] = useState(1);
   const [click, setClick] = useState(false);
+  const [coupon,setCoupon] = useState([]);
   //   const [select, setSelect] = useState(false);
 
   const handleMessageSubmit = () => {};
@@ -52,6 +55,19 @@ const ProductDetailsCard = ({ setOpen, data }) => {
   };
 
   useEffect(() => {
+    axios
+      .get(
+        `${server}/coupon/get-coupon`, {
+          withCredentials: true,
+        })
+      .then((res) => {
+        // console.log(res.data.couponCode);
+        setCoupon(res.data.couponCode)
+        // console.log(coupon[0]);
+      })
+      .catch((error) => {
+        toast.error(error);
+      });
     if (wishlist && wishlist.find((i) => i._id === data._id)) {
       setClick(true);
     } else {
@@ -91,9 +107,11 @@ const ProductDetailsCard = ({ setOpen, data }) => {
                       className="w-[50px] h-[50px] rounded-full mr-2"
                     />
                     <div>
+                      
                       <h3 className={`${styles.shop_name}`}>
                         {data.shop.name}
                       </h3>
+                      
                       <h5 className="pb-3 text-[15px]">{data?.ratings} Ratings</h5>
                     </div>
                   </Link>
@@ -106,10 +124,26 @@ const ProductDetailsCard = ({ setOpen, data }) => {
                     Send Message <AiOutlineMessage className="ml-1" />
                   </span>
                 </div>
-                <h5 className="text-[16px] text-[red] mt-5">(50) Sold out</h5>
+                <h5 className="text-[16px] text-[red] mt-5">(50) Sold outt</h5>
               </div>
 
-              <div className="w-full 800px:w-[50%] pt-5 pl-[5px] pr-[5px]">
+              <div className="w-full 800px:w-[50%] pt-5 pl-[5px] pr-[5px] ml-3">
+              {
+                  coupon.map((value) => {
+                    if (data.name == value.selectedProducts) {
+                      return (
+                        <>
+                          <div className="ml-2 mb-3 mr-3" style={{ backgroundColor: "#ffedf0", padding: "13px" }}>
+
+                            <p style={{ fontWeight: "500", color: "#de2342" }}>🎉 Special Offer: Enjoy {value.value}% Off  🎉</p>
+                            <p className="pt-1" style={{ color: "#524c4c" }}>Simply apply the coupon code <span style={{ color: "#de0e0e", fontWeight: "700", fontSize: "20px" }}>{value.name}</span> at checkout to receive a fantastic {value.value}% off your total order!</p>
+
+                          </div>
+                        </>
+                      )
+                    } else { <></> }
+                  })
+                }
                 <h1 className={`${styles.productTitle} text-[20px]`}>
                   {data.name}
                 </h1>

@@ -62,7 +62,8 @@ const ShopCreate = () => {
     }
     if (!password ) {
       setPasswordError("Password is required");
-    } else if (!/(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-zA-Z]).{6,}/.test(password)) {
+    } 
+    else if (!/(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-zA-Z]).{6,}/.test(password)) {
       setPasswordError("Password must contain at least one digit, one special character, and one letter, and be at least 6 characters long");
     } else {
       setPasswordError("");
@@ -173,7 +174,7 @@ const ShopCreate = () => {
               </label>
               <div className="mt-1">
                 <input
-                  type="email"
+                  type="text"
                   name="email"
                   autoComplete="email"
                   value={email}

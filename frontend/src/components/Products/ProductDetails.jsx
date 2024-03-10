@@ -29,7 +29,23 @@ const ProductDetails = ({ data }) => {
   const [select, setSelect] = useState(0);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [coupon, setCoupon] = useState([]);
+
   useEffect(() => {
+    axios
+      .get(
+        `${server}/coupon/get-coupon`, {
+        withCredentials: true,
+      })
+      .then((res) => {
+        // console.log(res.data.couponCode);
+        setCoupon(res.data.couponCode)
+        // console.log(coupon[0]);
+      })
+      .catch((error) => {
+        toast.error(error);
+      });
+
     dispatch(getAllProductsShop(data && data?.shop._id));
     if (wishlist && wishlist.find((i) => i._id === data?._id)) {
       setClick(true);
@@ -85,7 +101,7 @@ const ProductDetails = ({ data }) => {
       0
     );
 
-  const avg =  totalRatings / totalReviewsLength || 0;
+  const avg = totalRatings / totalReviewsLength || 0;
 
   const averageRating = avg.toFixed(2);
 
@@ -128,9 +144,8 @@ const ProductDetails = ({ data }) => {
                   {data &&
                     data.images.map((i, index) => (
                       <div
-                        className={`${
-                          select === 0 ? "border" : "null"
-                        } cursor-pointer`}
+                        className={`${select === 0 ? "border" : "null"
+                          } cursor-pointer`}
                       >
                         <img
                           src={`${i?.url}`}
@@ -141,13 +156,32 @@ const ProductDetails = ({ data }) => {
                       </div>
                     ))}
                   <div
-                    className={`${
-                      select === 1 ? "border" : "null"
-                    } cursor-pointer`}
+                    className={`${select === 1 ? "border" : "null"
+                      } cursor-pointer`}
                   ></div>
                 </div>
               </div>
               <div className="w-full 800px:w-[50%] pt-5">
+
+                {
+                  coupon.map((value) => {
+                    if (data.name == value.selectedProducts) {
+                      return (
+                        <>
+                          <div className="mb-3" style={{ backgroundColor: "#ffedf0", padding: "13px" }}>
+
+                            <p style={{ fontWeight: "500", color: "#de2342" }}>🎉 Special Offer: Enjoy {value.value}% Off  🎉</p>
+                            <p className="pt-2" style={{ color: "#524c4c" }}>We're thrilled to offer you an exclusive discount on this product. Simply apply the coupon code <span style={{ color: "#de0e0e", fontWeight: "700", fontSize: "20px" }}>{value.name}</span> at checkout to receive a fantastic {value.value}% off your total order!</p>
+
+                          </div>
+                        </>
+                      )
+                    } else { <></> }
+                  })
+                }
+
+
+
                 <h1 className={`${styles.productTitle}`}>{data.name}</h1>
                 <p>{data.description}</p>
                 <div className="flex pt-3">
@@ -202,7 +236,7 @@ const ProductDetails = ({ data }) => {
                   onClick={() => addToCartHandler(data._id)}
                 >
                   <span className="text-white flex items-center">
-                    Add to cart <AiOutlineShoppingCart className="ml-1" />
+                    Add to cart <AiOutlineShoppingCart className="ml-2 mt-1" />
                   </span>
                 </div>
                 <div className="flex items-center pt-8">
