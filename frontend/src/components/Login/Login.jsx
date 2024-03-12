@@ -17,13 +17,15 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    let isValid = true;
+
     // Validate email
     if (!email.trim()) {
       setEmailError("Email is required");
-      return;
+      isValid = false;
     }else if (!/\S+@\S+\.\S+/.test(email)){
       setEmailError("Invalid Email Format");
-      return;
+      isValid = false;
     } 
     else {
       setEmailError("");
@@ -32,17 +34,14 @@ const Login = () => {
     // Validate password
     if (!password.trim()) {
       setPasswordError("Password is required");
-      return;
+      isValid = false;
     } 
-    // else if (!/(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-zA-Z]).{6,}/.test(password)) {
-    //   setPasswordError("Password must contain at least one digit, one special character, and one letter, and be at least 6 characters long");
-    //   return;
-    // } 
     else {
       setPasswordError("");
     }
 
-    await axios
+    if(isValid == true){
+      await axios
       .post(
         `${server}/user/login-user`,
         {
@@ -60,6 +59,8 @@ const Login = () => {
         toast.error(err.response.data.message);
         console.log(err);
       });
+    }
+    
   };
 
   return (

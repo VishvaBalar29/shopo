@@ -17,7 +17,7 @@ const Singup = () => {
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [avatarError, setAvatarError] = useState("");
-
+  
   const handleFileInputChange = (e) => {
     const reader = new FileReader();
 
@@ -30,38 +30,49 @@ const Singup = () => {
     reader.readAsDataURL(e.target.files[0]);
   };
 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+       
+    let isValid = true;
+
     if (!name.trim()) {
       setNameError("Name is required");
+      isValid = false;
     } else {
       setNameError("");
     }
     if (!email.trim()) {
       setEmailError("Email is required");
+      isValid = false;
     }
     else if (!/\S+@\S+\.\S+/.test(email)){
       setEmailError("Invalid Email Format");
+      isValid = false;
     } 
     else {
       setEmailError("");
     }
     if (!password.trim()) {
       setPasswordError("Password is required");
-    } else if (!/(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-zA-Z]).{6,}/.test(password)) {
+      isValid = false;
+    } 
+    else if (!/(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-zA-Z]).{6,}/.test(password)) {
       setPasswordError("Password must contain at least one digit, one special character, and one letter, and be at least 6 characters long");
-    } else {
+      isValid = false;
+    } 
+    else {
       setPasswordError("");
     }
     if (!avatar) {
       setAvatarError("Please selete Your Profile Pic");
+      isValid = false;
     }else {
       setAvatarError("");
     }
 
-
-    axios
+    if(isValid == true){
+      axios
       .post(`${server}/user/create-user`, { name, email, password, avatar })
       .then((res) => {
         toast.success(res.data.message);
@@ -73,6 +84,8 @@ const Singup = () => {
       .catch((error) => {
         // toast.error(error.response.data.message);
       });
+    }
+    
   };
 
   return (

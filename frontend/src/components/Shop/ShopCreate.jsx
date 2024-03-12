@@ -27,54 +27,68 @@ const ShopCreate = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    let isValid = true;
+
     if (!email) {
       setEmailError("Email is required");
+      isValid = false;
     }
     else if (!/\S+@\S+\.\S+/.test(email)){
       setEmailError("Invalid Email Format");
+      isValid = false;
     } 
     else {
       setEmailError("");
     }
     if (!name) {
       setNameError("Name is required");
+      isValid = false;
     } else {
       setNameError("");
     }
     if (!phoneNumber ) {
       setPhoneNumberError("Phone Number is required");
+      isValid = false;
     }
     else if (!/^\d{10}$/.test(phoneNumber)){
       setPhoneNumberError("Please enter a valid 10-digit phone number");
+      isValid = false;
     } 
     else {
       setPhoneNumberError("");
     }
     if (!address) {
       setAddressError("Address is required");
+      isValid = false;
     } else {
       setAddressError("");
     }
     if (!zipCode ) {
       setZipCodeError("Zipcode is required");
+      isValid = false;
     } else {
       setZipCodeError("");
     }
     if (!password ) {
       setPasswordError("Password is required");
+      isValid = false;
     } 
     else if (!/(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-zA-Z]).{6,}/.test(password)) {
       setPasswordError("Password must contain at least one digit, one special character, and one letter, and be at least 6 characters long");
-    } else {
+      isValid = false;
+    } 
+    else {
       setPasswordError("");
     }
     if (!avatar) {
       setAvatarError("Please selete Your Profile Pic");
+      isValid = false;
     }else {
       setAvatarError("");
     }
-    console.log("hello");
-    axios
+    // console.log("hello");
+    if(isValid == true){
+      axios
       .post(`${server}/shop/create-shop`, {
         name,
         email,
@@ -97,9 +111,10 @@ const ShopCreate = () => {
       .catch((error) => {
         // toast.error(error.response.data.message);
       });
+    }    
   };
 
-  console.log(setPhoneNumberError);
+  // console.log(setPhoneNumberError);
 
   const handleFileInputChange = (e) => {
     const reader = new FileReader();

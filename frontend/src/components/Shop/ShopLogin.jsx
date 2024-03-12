@@ -14,34 +14,32 @@ const ShopLogin = () => {
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
- // Validate email
- if (!email.trim()) {
-  setEmailError("Email is required");
-  return;
-}else if (!/\S+@\S+\.\S+/.test(email)){
-  setEmailError("Invalid Email Format");
-  return;
-} 
-else {
-  setEmailError("");
-}
+    let isValid = true;
+    // Validate email
+    if (!email.trim()) {
+      setEmailError("Email is required");
+      isValid = false;
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      setEmailError("Invalid Email Format");
+      isValid = false;
+    }
+    else {
+      setEmailError("");
+    }
 
-// Validate password
-if (!password.trim()) {
-  setPasswordError("Password is required");
-  return;
-} 
-// else if (!/(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-zA-Z]).{6,}/.test(password)) {
-//   setPasswordError("Password must contain at least one digit, one special character, and one letter, and be at least 6 characters long");
-//   return;
-// } 
-else {
-  setPasswordError("");
-}
-    await axios
+    // Validate password
+    if (!password.trim()) {
+      setPasswordError("Password is required");
+      isValid = false;
+    }
+    else {
+      setPasswordError("");
+    }
+
+    if(isValid == true){
+      await axios
       .post(
         `${server}/shop/login-shop`,
         {
@@ -53,11 +51,12 @@ else {
       .then((res) => {
         toast.success("Login Success!");
         navigate("/dashboard");
-        window.location.reload(true); 
+        window.location.reload(true);
       })
       .catch((err) => {
         toast.error(err.response.data.message);
       });
+    }   
   };
 
   return (
@@ -82,12 +81,11 @@ else {
                   type="email"
                   name="email"
                   autoComplete="email"
-                  required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
-                 {emailError && (
+                {emailError && (
                   <p className="text-red-500 text-sm">{emailError}</p>
                 )}
               </div>
@@ -104,12 +102,11 @@ else {
                   type={visible ? "text" : "password"}
                   name="password"
                   autoComplete="current-password"
-                  required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
-                 {passwordError && (
+                {passwordError && (
                   <p className="text-red-500 text-sm">{passwordError}</p>
                 )}
                 {visible ? (
