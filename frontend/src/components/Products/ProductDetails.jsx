@@ -181,7 +181,6 @@ const ProductDetails = ({ data }) => {
                 }
 
 
-
                 <h1 className={`${styles.productTitle}`}>{data.name}</h1>
                 <p>{data.description}</p>
                 <div className="flex pt-3">
