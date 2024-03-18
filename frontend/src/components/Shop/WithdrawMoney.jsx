@@ -99,6 +99,7 @@ const WithdrawMoney = () => {
     }
   };
 
+  console.log(seller);
   const availableBalance = seller?.availableBalance.toFixed(2);
 
   return (

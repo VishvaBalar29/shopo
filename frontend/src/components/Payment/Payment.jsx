@@ -58,6 +58,7 @@ const Payment = () => {
     totalPrice: orderData?.totalPrice,
   };
 
+  // for paypal
   const onApprove = async (data, actions) => {
     return actions.order.capture().then(function (details) {
       const { payer } = details;
@@ -99,6 +100,60 @@ const Payment = () => {
     amount: Math.round(orderData?.totalPrice * 100),
   };
 
+  // credit card-debit card
+  // const paymentHandler = async (e) => {
+  //   e.preventDefault();
+  //   try {
+  //     const config = {
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //     };
+
+  //     const { data } = await axios.post(
+  //       `${server}/payment/process`,
+  //       paymentData,
+  //       config
+  //     );
+
+  //     const client_secret = data.client_secret;
+  //     // console.log(client_secret);
+
+  //     if (!stripe || !elements) return;
+  //     const result = await stripe.confirmCardPayment(client_secret, {
+  //       payment_method: {
+  //         card: elements.getElement(CardNumberElement),
+  //       },
+  //     });
+
+  //     if (result.error) {
+  //       toast.error(result.error.message);
+  //     } else {
+  //       if (result.paymentIntent.status === "succeeded") {
+  //         order.paymnentInfo = {
+  //           id: result.paymentIntent.id,
+  //           status: result.paymentIntent.status,
+  //           type: "Credit Card",
+  //         };
+
+  //         await axios
+  //           .post(`${server}/order/create-order`, order, config)
+  //           .then((res) => {
+  //             setOpen(false);
+  //             navigate("/order/success");
+  //             toast.success("Order successful!");
+  //             localStorage.setItem("cartItems", JSON.stringify([]));
+  //             localStorage.setItem("latestOrder", JSON.stringify([]));
+  //             window.location.reload();
+  //           });
+  //       }
+  //     }
+  //   } catch (error) {
+  //     // toast.error(error);
+  //     toast.error("catch");
+  //   }
+  // };
+
   const paymentHandler = async (e) => {
     e.preventDefault();
     try {
@@ -108,48 +163,28 @@ const Payment = () => {
         },
       };
 
-      const { data } = await axios.post(
-        `${server}/payment/process`,
-        paymentData,
-        config
-      );
+      order.paymentInfo = {
+        type: "Credit cardddd",
+      };
 
-      const client_secret = data.client_secret;
+      await axios
+        .post(`${server}/order/create-order`, order, config)
+        .then((res) => {
+          setOpen(false);
+          navigate("/order/success");
+          toast.success("Order successful!");
+          localStorage.setItem("cartItems", JSON.stringify([]));
+          localStorage.setItem("latestOrder", JSON.stringify([]));
+          window.location.reload();
+        });
 
-      if (!stripe || !elements) return;
-      const result = await stripe.confirmCardPayment(client_secret, {
-        payment_method: {
-          card: elements.getElement(CardNumberElement),
-        },
-      });
-
-      if (result.error) {
-        toast.error(result.error.message);
-      } else {
-        if (result.paymentIntent.status === "succeeded") {
-          order.paymnentInfo = {
-            id: result.paymentIntent.id,
-            status: result.paymentIntent.status,
-            type: "Credit Card",
-          };
-
-          await axios
-            .post(`${server}/order/create-order`, order, config)
-            .then((res) => {
-              setOpen(false);
-              navigate("/order/success");
-              toast.success("Order successful!");
-              localStorage.setItem("cartItems", JSON.stringify([]));
-              localStorage.setItem("latestOrder", JSON.stringify([]));
-              window.location.reload();
-            });
-        }
-      }
     } catch (error) {
-      toast.error(error);
+      // toast.error(error);
+      toast.error("catch");
     }
   };
 
+  // for cash on delievery 
   const cashOnDeliveryHandler = async (e) => {
     e.preventDefault();
 
@@ -164,15 +199,15 @@ const Payment = () => {
     };
 
     await axios
-    .post(`${server}/order/create-order`, order, config)
-    .then((res) => {
-      setOpen(false);
-      navigate("/order/success");
-      toast.success("Order successful!");
-      localStorage.setItem("cartItems", JSON.stringify([]));
-      localStorage.setItem("latestOrder", JSON.stringify([]));
-      window.location.reload();
-    });
+      .post(`${server}/order/create-order`, order, config)
+      .then((res) => {
+        setOpen(false);
+        navigate("/order/success");
+        toast.success("Order successful!");
+        localStorage.setItem("cartItems", JSON.stringify([]));
+        localStorage.setItem("latestOrder", JSON.stringify([]));
+        window.location.reload();
+      });
   };
 
   return (
@@ -356,24 +391,24 @@ const PaymentInfo = ({
                       onClick={() => setOpen(false)}
                     />
                   </div>
-                    <PayPalScriptProvider
-                      options={{
-                        "client-id":
-                          "Aczac4Ry9_QA1t4c7TKH9UusH3RTe6onyICPoCToHG10kjlNdI-qwobbW9JAHzaRQwFMn2-k660853jn",
-                      }}
-                    >
-                      <PayPalButtons
-                        style={{ layout: "vertical" }}
-                        onApprove={onApprove}
-                        createOrder={createOrder}
-                      />
-                    </PayPalScriptProvider>
+                  <PayPalScriptProvider
+                    options={{
+                      "client-id":
+                        "Aczac4Ry9_QA1t4c7TKH9UusH3RTe6onyICPoCToHG10kjlNdI-qwobbW9JAHzaRQwFMn2-k660853jn",
+                    }}
+                  >
+                    <PayPalButtons
+                      style={{ layout: "vertical" }}
+                      onApprove={onApprove}
+                      createOrder={createOrder}
+                    />
+                  </PayPalScriptProvider>
                 </div>
               </div>
             )}
           </div>
         ) : null}
-      </div> 
+      </div>
 
       <br />
       {/* cash on delivery */}
@@ -425,7 +460,7 @@ const CartData = ({ orderData }) => {
       <br />
       <div className="flex justify-between border-b pb-3">
         <h3 className="text-[16px] font-[400] text-[#000000a4]">Discount:</h3>
-        <h5 className="text-[18px] font-[600]">{orderData?.discountPrice? "$" + orderData.discountPrice : "-"}</h5>
+        <h5 className="text-[18px] font-[600]">{orderData?.discountPrice ? "$" + orderData.discountPrice : "-"}</h5>
       </div>
       <h5 className="text-[18px] font-[600] text-end pt-3">
         ${orderData?.totalPrice}
