@@ -16,6 +16,7 @@ import { server } from "../../server";
 import { toast } from "react-toastify";
 import { RxCross1 } from "react-icons/rx";
 
+
 const Payment = () => {
   const [orderData, setOrderData] = useState([]);
   const [open, setOpen] = useState(false);
@@ -89,7 +90,8 @@ const Payment = () => {
       .then((res) => {
         setOpen(false);
         navigate("/order/success");
-        toast.success("Order successful!");
+        // toast.success("Order successful!");
+        toast.success(res.data.message);
         localStorage.setItem("cartItems", JSON.stringify([]));
         localStorage.setItem("latestOrder", JSON.stringify([]));
         window.location.reload();

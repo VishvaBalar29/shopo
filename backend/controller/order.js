@@ -6,6 +6,7 @@ const { isAuthenticated, isSeller, isAdmin } = require("../middleware/auth");
 const Order = require("../model/order");
 const Shop = require("../model/shop");
 const Product = require("../model/product");
+const sendMail = require("../utils/sendMail");
 
 // create new order
 router.post(
@@ -38,13 +39,22 @@ router.post(
         });
         orders.push(order);
       }
+      //  console.log(user.email);
+   
+      await sendMail({
+        to: user.email,
+        subject: 'Order Confirmation',
+        text: 'Your order has been confirmed. Thank you for shopping with us!',
+      });
 
       res.status(201).json({
         success: true,
+        message: `Order confirmed. Please check your email (${user.email}) for confirmation.`,
         orders,
       });
     } catch (error) {
       return next(new ErrorHandler(error.message, 500));
+      // console.log(error);
     }
   })
 );
