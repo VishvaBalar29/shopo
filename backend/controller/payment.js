@@ -50,11 +50,6 @@ router.post(
   })
 );
 
-
-
-
-
-
 router.get(
   "/stripeapikey",
   catchAsyncErrors(async (req, res, next) => {

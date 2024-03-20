@@ -7,6 +7,7 @@ const Order = require("../model/order");
 const Shop = require("../model/shop");
 const Product = require("../model/product");
 const sendMail = require("../utils/sendMail");
+const nodemailer = require('nodemailer');
 
 // create new order
 router.post(
@@ -39,19 +40,34 @@ router.post(
         });
         orders.push(order);
       }
-      //  console.log(user.email);
-   
-      await sendMail({
-        to: user.email,
-        subject: 'Order Confirmation',
-        text: 'Your order has been confirmed. Thank you for shopping with us!',
+
+      // send mail of order done
+      var transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: 'vishubalar29@gmail.com',
+          pass: 'fwth uxqn jpne cppu'
+        }
       });
 
-      res.status(201).json({
+      var mailOptions = {
+        from: 'vishubalar29@gmail.com',
+        to: user.email,
+        subject: `Hello .. ${user.name}`,
+        html: `<h2>Order Delivered</h2>`
+      };
+
+      transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+          res.status(400).json({ message: "error from nodemailer in register API", });
+          return;
+        }
+      })
+      res.status(200).json({
         success: true,
-        message: `Order confirmed. Please check your email (${user.email}) for confirmation.`,
         orders,
       });
+
     } catch (error) {
       return next(new ErrorHandler(error.message, 500));
       // console.log(error);
@@ -143,7 +159,7 @@ router.put(
 
       async function updateSellerInfo(amount) {
         const seller = await Shop.findById(req.seller.id);
-        
+
         seller.availableBalance = amount;
 
         await seller.save();

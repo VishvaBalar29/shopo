@@ -88,6 +88,7 @@ const Payment = () => {
     await axios
       .post(`${server}/order/create-order`, order, config)
       .then((res) => {
+        console.log("hello");
         setOpen(false);
         navigate("/order/success");
         // toast.success("Order successful!");
