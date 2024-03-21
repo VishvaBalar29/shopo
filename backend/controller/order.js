@@ -28,7 +28,6 @@ router.post(
         shopItemsMap.get(shopId).push(item);
       }
 
-      // create an order for each shop
       const orders = [];
 
       for (const [shopId, items] of shopItemsMap) {
@@ -61,7 +60,7 @@ router.post(
       }
       pdfDoc.end();
 
-      // Send confirmation email with attached PDF
+      // Send confirmation email with pdf
       const transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
@@ -82,7 +81,6 @@ router.post(
       };
 
       transporter.sendMail(mailOptions, function (error, info) {
-        // Remove the PDF file after sending the email, regardless of success or failure
         fs.unlinkSync(pdfFilePath);
 
         if (error) {
