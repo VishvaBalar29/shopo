@@ -42,22 +42,50 @@ router.post(
       }
 
       // Generate PDF for bill
+      // const pdfDoc = new PDFDocument();
+      // const pdfFilePath = `bill_${Date.now()}.pdf`;
+      // pdfDoc.pipe(fs.createWriteStream(pdfFilePath));
+      // pdfDoc.fontSize(12).text('Bill of Purchase\n\n');
+      // for (const order of orders) {
+      //   pdfDoc.text(`Order ID: ${order._id}`);
+      //   pdfDoc.text(`Shipping Address: ${shippingAddress}`);
+      //   pdfDoc.text(`Total Price: ${totalPrice}`);
+      //   pdfDoc.text('\nProducts:');
+      //   console.log(order.cart);
+      //   order.cart.forEach(items => {
+      //     console.log(`Processing item: ${items.name} (Qty: ${items.quantity}, Price: ${items.price})`);
+      //     pdfDoc.text(`- ${items.name} (Qty: ${items.quantity}, Price: ${items.price})`);
+      //   });
+      //   pdfDoc.text('\n');
+      // }
+      // pdfDoc.end();
+
       const pdfDoc = new PDFDocument();
       const pdfFilePath = `bill_${Date.now()}.pdf`;
       pdfDoc.pipe(fs.createWriteStream(pdfFilePath));
-      pdfDoc.fontSize(12).text('Bill of Purchase\n\n');
+
+      // Set up PDF formatting
+      pdfDoc.fontSize(12);
+      pdfDoc.font('Helvetica-Bold').text('Bill of Purchase', { align: 'center' }).font('Helvetica');
+      pdfDoc.moveDown();
+      
+      // Add order details
       for (const order of orders) {
-        pdfDoc.text(`Order ID: ${order._id}`);
-        pdfDoc.text(`Shipping Address: ${shippingAddress}`);
+        pdfDoc.font('Helvetica-Bold').text(`Order ID: ${order._id}`).font('Helvetica');
+        pdfDoc.text(`Shipping Address: ${shippingAddress.address1}, ${shippingAddress.address2}, ${shippingAddress.zipCode}, ${shippingAddress.city}, ${shippingAddress.country}`);
         pdfDoc.text(`Total Price: ${totalPrice}`);
-        pdfDoc.text('\nProducts:');
-        console.log(order.cart);
-        order.cart.forEach(items => {
-          console.log(`Processing item: ${items.name} (Qty: ${items.quantity}, Price: ${items.price})`);
-          pdfDoc.text(`- ${items.name} (Qty: ${items.quantity}, Price: ${items.price})`);
-        });
-        pdfDoc.text('\n');
+        pdfDoc.moveDown();
+        
+        // Add products
+        pdfDoc.font('Helvetica-Bold').text('Products').font('Helvetica');
+        for (const item of order.cart) {
+          console.log(item);
+          console.log(`Processing item: ${item.name} (Qty: ${item.quantity}, Price: ${item.price})`);
+          pdfDoc.text(`- ${item.name} (Qty: ${item.quantity}, Price: ${item.price})`);
+        }
+        pdfDoc.moveDown();
       }
+
       pdfDoc.end();
 
       // Send confirmation email with pdf
