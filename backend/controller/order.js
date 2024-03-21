@@ -6,8 +6,9 @@ const { isAuthenticated, isSeller, isAdmin } = require("../middleware/auth");
 const Order = require("../model/order");
 const Shop = require("../model/shop");
 const Product = require("../model/product");
-const sendMail = require("../utils/sendMail");
-const nodemailer = require('nodemailer');
+const PDFDocument = require('pdfkit');
+const nodemailer = require("nodemailer");
+const fs = require('fs');
 
 // create new order
 router.post(
@@ -16,7 +17,7 @@ router.post(
     try {
       const { cart, shippingAddress, user, totalPrice, paymentInfo } = req.body;
 
-      //   group cart items by shopId
+      // Group cart items by shopId
       const shopItemsMap = new Map();
 
       for (const item of cart) {
@@ -41,8 +42,27 @@ router.post(
         orders.push(order);
       }
 
-      // send mail of order done
-      var transporter = nodemailer.createTransport({
+      // Generate PDF for bill
+      const pdfDoc = new PDFDocument();
+      const pdfFilePath = `bill_${Date.now()}.pdf`;
+      pdfDoc.pipe(fs.createWriteStream(pdfFilePath));
+      pdfDoc.fontSize(12).text('Bill of Purchase\n\n');
+      for (const order of orders) {
+        pdfDoc.text(`Order ID: ${order._id}`);
+        pdfDoc.text(`Shipping Address: ${shippingAddress}`);
+        pdfDoc.text(`Total Price: ${totalPrice}`);
+        pdfDoc.text('\nProducts:');
+        console.log(order.cart);
+        order.cart.forEach(items => {
+          console.log(`Processing item: ${items.name} (Qty: ${items.quantity}, Price: ${items.price})`);
+          pdfDoc.text(`- ${items.name} (Qty: ${items.quantity}, Price: ${items.price})`);
+        });
+        pdfDoc.text('\n');
+      }
+      pdfDoc.end();
+
+      // Send confirmation email with attached PDF
+      const transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
           user: 'vishubalar29@gmail.com',
@@ -50,27 +70,34 @@ router.post(
         }
       });
 
-      var mailOptions = {
+      const mailOptions = {
         from: 'vishubalar29@gmail.com',
         to: user.email,
-        subject: `Hello .. ${user.name}`,
-        html: `<h2>Order Delivered</h2>`
+        subject: `Order Confirmation & Bill for ${user.name}`,
+        html: `<h2>Your order has been confirmed. Thank you for shopping with us!</h2>`,
+        attachments: [{
+          filename: 'bill.pdf',
+          path: pdfFilePath
+        }]
       };
 
       transporter.sendMail(mailOptions, function (error, info) {
-        if (error) {
-          res.status(400).json({ message: "error from nodemailer in register API", });
-          return;
-        }
-      })
-      res.status(200).json({
-        success: true,
-        orders,
-      });
+        // Remove the PDF file after sending the email, regardless of success or failure
+        fs.unlinkSync(pdfFilePath);
 
+        if (error) {
+          console.error('Error sending email:', error);
+          return res.status(400).json({ message: "Error sending email with bill attached" });
+        }
+        console.log('Email sent:', info.response);
+        res.status(200).json({
+          success: true,
+          orders,
+        });
+      });
     } catch (error) {
-      return next(new ErrorHandler(error.message, 500));
-      // console.log(error);
+      console.log(error);
+      // return next(new ErrorHandler(error.message, 500));
     }
   })
 );
