@@ -20,38 +20,57 @@ const Checkout = () => {
   const [couponCode, setCouponCode] = useState("");
   const [couponCodeData, setCouponCodeData] = useState(null);
   const [discountPrice, setDiscountPrice] = useState(null);
+  const [ewalletMoney, setEwalletMoney] = useState(null);
+  const [ewallet, setEwallet] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, []);
+    axios
+      .get(
+        `${server}/ewallet/get-Ewallets`, {
+        withCredentials: true,
+      })
+      .then((res) => {
+        setEwallet(res.data.EwalletData);
+        const userEwallet = res.data.EwalletData.find((value) => user && user._id === value.userId);
+        if (userEwallet) {
+          setEwalletMoney(userEwallet.amount);
+        }
+        // console.log("hello");
+        console.log(ewalletMoney);
+      })
+      .catch((error) => {
+        toast.error(error);
+      });
+  }, [ewalletMoney]);
 
   const paymentSubmit = () => {
-   if(address1 === "" || address2 === "" || zipCode === null || country === "" || city === ""){
+    if (address1 === "" || address2 === "" || zipCode === null || country === "" || city === "") {
       toast.error("Please choose your delivery address!")
-   } else{
-    const shippingAddress = {
-      address1,
-      address2,
-      zipCode,
-      country,
-      city,
-    };
+    } else {
+      const shippingAddress = {
+        address1,
+        address2,
+        zipCode,
+        country,
+        city,
+      };
 
-    const orderData = {
-      cart,
-      totalPrice,
-      subTotalPrice,
-      shipping,
-      discountPrice,
-      shippingAddress,
-      user,
+      const orderData = {
+        cart,
+        totalPrice,
+        subTotalPrice,
+        shipping,
+        discountPrice,
+        shippingAddress,
+        user,
+      }
+
+      // update local storage with the updated orders array
+      localStorage.setItem("latestOrder", JSON.stringify(orderData));
+      navigate("/payment");
     }
-
-    // update local storage with the updated orders array
-    localStorage.setItem("latestOrder", JSON.stringify(orderData));
-    navigate("/payment");
-   }
   };
 
   const subTotalPrice = cart.reduce(
@@ -94,6 +113,11 @@ const Checkout = () => {
     });
   };
 
+  const handleEwallet = async (e) => {
+    e.preventDefault();
+    alert("hello")
+  }
+
   const discountPercentenge = couponCodeData ? discountPrice : "";
 
   const totalPrice = couponCodeData
@@ -103,44 +127,51 @@ const Checkout = () => {
   console.log(discountPercentenge);
 
   return (
-    <div className="w-full flex flex-col items-center py-8">
-      <div className="w-[90%] 1000px:w-[70%] block 800px:flex">
-        <div className="w-full 800px:w-[65%]">
-          <ShippingInfo
-            user={user}
-            country={country}
-            setCountry={setCountry}
-            city={city}
-            setCity={setCity}
-            userInfo={userInfo}
-            setUserInfo={setUserInfo}
-            address1={address1}
-            setAddress1={setAddress1}
-            address2={address2}
-            setAddress2={setAddress2}
-            zipCode={zipCode}
-            setZipCode={setZipCode}
-          />
+
+
+    <>
+      <div className="w-full flex flex-col items-center py-8">
+
+        <div className="w-[90%] 1000px:w-[70%] block 800px:flex">
+          <div className="w-full 800px:w-[65%]">
+            <ShippingInfo
+              user={user}
+              country={country}
+              setCountry={setCountry}
+              city={city}
+              setCity={setCity}
+              userInfo={userInfo}
+              setUserInfo={setUserInfo}
+              address1={address1}
+              setAddress1={setAddress1}
+              address2={address2}
+              setAddress2={setAddress2}
+              zipCode={zipCode}
+              setZipCode={setZipCode}
+            />
+          </div>
+
+          <div className="w-full 800px:w-[35%] 800px:mt-0 mt-8">
+            <CartData
+              handleSubmit={handleSubmit}
+              handleEwallet={handleEwallet}
+              totalPrice={totalPrice}
+              shipping={shipping}
+              subTotalPrice={subTotalPrice}
+              couponCode={couponCode}
+              setCouponCode={setCouponCode}
+              discountPercentenge={discountPercentenge}
+            />
+          </div>
         </div>
-        <div className="w-full 800px:w-[35%] 800px:mt-0 mt-8">
-          <CartData
-            handleSubmit={handleSubmit}
-            totalPrice={totalPrice}
-            shipping={shipping}
-            subTotalPrice={subTotalPrice}
-            couponCode={couponCode}
-            setCouponCode={setCouponCode}
-            discountPercentenge={discountPercentenge}
-          />
+        <div
+          className={`${styles.button} w-[150px] 800px:w-[280px] mt-10`}
+          onClick={paymentSubmit}
+        >
+          <h5 className="text-white">Go to Payment</h5>
         </div>
       </div>
-      <div
-        className={`${styles.button} w-[150px] 800px:w-[280px] mt-10`}
-        onClick={paymentSubmit}
-      >
-        <h5 className="text-white">Go to Payment</h5>
-      </div>
-    </div>
+    </>
   );
 };
 
@@ -305,6 +336,7 @@ const ShippingInfo = ({
 
 const CartData = ({
   handleSubmit,
+  handleEwallet,
   totalPrice,
   shipping,
   subTotalPrice,
@@ -345,6 +377,16 @@ const CartData = ({
           className={`w-full h-[40px] border border-[#f63b60] text-center text-[#f63b60] rounded-[3px] mt-8 cursor-pointer`}
           required
           value="Apply code"
+          type="submit"
+        />
+      </form>
+
+
+      <form onSubmit={handleEwallet}>
+        <input
+          className={`w-full h-[40px] border border-[#f63b60] text-center text-[#f63b60] rounded-[3px] mt-8 cursor-pointer`}
+          required
+          value="Use Your E-wallet money"
           type="submit"
         />
       </form>

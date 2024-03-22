@@ -4,6 +4,7 @@ const ErrorHandler = require("../utils/ErrorHandler");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const { isAuthenticated, isSeller, isAdmin } = require("../middleware/auth");
 const Order = require("../model/order");
+const Ewallet = require("../model/e-wallet");
 const Shop = require("../model/shop");
 const Product = require("../model/product");
 const PDFDocument = require('pdfkit');
@@ -236,7 +237,9 @@ router.put(
 
       order.status = req.body.status;
 
+      
       await order.save({ validateBeforeSave: false });
+
 
       res.status(200).json({
         success: true,
@@ -264,6 +267,13 @@ router.put(
       order.status = req.body.status;
 
       await order.save();
+      const ewalletData = await Ewallet.create({
+        orderId:order._id,
+        userId:order.user._id,
+        username:order.user.name,
+        amount:order.totalPrice
+      });
+      console.log(ewalletData);
 
       res.status(200).json({
         success: true,

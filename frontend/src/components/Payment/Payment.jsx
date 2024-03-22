@@ -52,6 +52,7 @@ const Payment = () => {
       });
   };
 
+  
   const order = {
     cart: orderData?.cart,
     shippingAddress: orderData?.shippingAddress,
@@ -469,6 +470,9 @@ const CartData = ({ orderData }) => {
         ${orderData?.totalPrice}
       </h5>
       <br />
+    <div>
+      <p>e-wallet</p>
+    </div>
     </div>
   );
 };
