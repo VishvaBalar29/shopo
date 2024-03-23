@@ -35,6 +35,8 @@ const Payment = () => {
     setOrderData(orderData);
     console.log("cutewalletMoney updated: ", cutewalletMoney);
     console.log("remain updated: ", remainingMoney);
+    setTotalPrice(orderData?.totalPrice)
+    console.log(totalPrice);
     axios
       .get(
         `${server}/ewallet/get-Ewallets`, {
@@ -50,7 +52,7 @@ const Payment = () => {
       .catch((error) => {
         toast.error(error);
       });
-  }, [ewalletMoney,cutewalletMoney,remainingMoney]);
+  }, [totalPrice,ewalletMoney,cutewalletMoney,remainingMoney]);
 
 
 
