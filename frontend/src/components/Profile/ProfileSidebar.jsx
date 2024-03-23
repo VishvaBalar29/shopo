@@ -99,20 +99,7 @@ const ProfileSidebar = ({ setActive, active }) => {
           Track Order
         </span>
       </div>
-      <div
-        className="flex items-center cursor-pointer w-full mb-8"
-        onClick={() => setActive(5)}
-      >
-        <MdOutlineTrackChanges size={20} color={active === 5 ? "red" : ""} />
-        <span
-          className={`pl-3 ${
-            active === 5 ? "text-[red]" : ""
-          } 800px:block hidden`}
-        >
-          Track Order
-        </span>
-      </div>
-
+    
       <div
         className="flex items-center cursor-pointer w-full mb-8"
         onClick={() => setActive(6)}

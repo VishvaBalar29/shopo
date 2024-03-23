@@ -20,30 +20,12 @@ const Checkout = () => {
   const [couponCode, setCouponCode] = useState("");
   const [couponCodeData, setCouponCodeData] = useState(null);
   const [discountPrice, setDiscountPrice] = useState(null);
-  const [ewalletMoney, setEwalletMoney] = useState(null);
-  const [ewallet, setEwallet] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    axios
-      .get(
-        `${server}/ewallet/get-Ewallets`, {
-        withCredentials: true,
-      })
-      .then((res) => {
-        setEwallet(res.data.EwalletData);
-        const userEwallet = res.data.EwalletData.find((value) => user && user._id === value.userId);
-        if (userEwallet) {
-          setEwalletMoney(userEwallet.amount);
-        }
-        // console.log("hello");
-        console.log(ewalletMoney);
-      })
-      .catch((error) => {
-        toast.error(error);
-      });
-  }, [ewalletMoney]);
+    
+  }, []);
 
   const paymentSubmit = () => {
     if (address1 === "" || address2 === "" || zipCode === null || country === "" || city === "") {
@@ -375,16 +357,6 @@ const CartData = ({
           className={`w-full h-[40px] border border-[#f63b60] text-center text-[#f63b60] rounded-[3px] mt-8 cursor-pointer`}
           required
           value="Apply code"
-          type="submit"
-        />
-      </form>
-
-
-      <form onSubmit={handleEwallet}>
-        <input
-          className={`w-full h-[40px] border border-[#f63b60] text-center text-[#f63b60] rounded-[3px] mt-8 cursor-pointer`}
-          required
-          value="Use Your E-wallet money"
           type="submit"
         />
       </form>
