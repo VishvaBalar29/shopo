@@ -30,10 +30,12 @@ const ProfileContent = ({ active }) => {
   const [email, setEmail] = useState(user && user.email);
   const [phoneNumber, setPhoneNumber] = useState(user && user.phoneNumber);
   const [password, setPassword] = useState("");
+  const [ewalletMoney, setEwalletMoney] = useState(0);
   const [avatar, setAvatar] = useState(null);
   const dispatch = useDispatch();
 
   useEffect(() => {
+    console.log(user._id);
     if (error) {
       toast.error(error);
       dispatch({ type: "clearErrors" });
@@ -42,7 +44,23 @@ const ProfileContent = ({ active }) => {
       toast.success(successMessage);
       dispatch({ type: "clearMessages" });
     }
-  }, [error, successMessage]);
+    axios
+      .get(
+        `${server}/ewallet/get-Ewallets`, {
+        withCredentials: true,
+      })
+      .then((res) => {
+        const userEwallet = res.data.EwalletData.find((value) => user && user._id === value.userId);
+        if (userEwallet) {
+          setEwalletMoney(userEwallet.amount);
+        }else{
+          setEwalletMoney(0);
+        }
+      })
+      .catch((error) => {
+        toast.error(error);
+      });
+  }, [error, successMessage, ewalletMoney]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -104,6 +122,11 @@ const ProfileContent = ({ active }) => {
           <br />
           <br />
           <div className="w-full px-5">
+            <div className="mb-5 pb-5">
+
+              <p style={{fontSize:"29px",color:"black",fontWeight:"500"}}>Shopo Balance : <span style={{color:"#cc0f0f",fontWeight:700}}>₹ {ewalletMoney}</span></p>
+              
+            </div>
             <form onSubmit={handleSubmit} aria-required={true}>
               <div className="w-full 800px:flex block pb-3">
                 <div className=" w-[100%] 800px:w-[50%]">

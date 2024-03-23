@@ -32,10 +32,13 @@ router.put(
       const id = req.params.id;
       const remainingMoney = req.params.money;
       const data = await Ewallet.findOne({userId:id});
-      const updateData = await Ewallet.updateOne({userId:id},{$set:{amount:remainingMoney}});
+      if(remainingMoney == 0){
+        await Ewallet.deleteOne({userId:id});
+      }else{
+        const updateData = await Ewallet.updateOne({userId:id},{$set:{amount:remainingMoney}});
+      }
       res.status(201).json({
-        success: true,
-        money : updateData
+        success: true
       });
     } catch (error) {
       return next(new ErrorHandler(error.message, 500));
