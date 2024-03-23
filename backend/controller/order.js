@@ -7,10 +7,10 @@ const Order = require("../model/order");
 const Ewallet = require("../model/e-wallet");
 const Shop = require("../model/shop");
 const Product = require("../model/product");
-const PDFDocument = require('pdfkit');
 const nodemailer = require("nodemailer");
+const PDFDocument = require('pdfkit');
 const fs = require('fs');
-
+// const { PDFTable } = require('pdfkit-table');
 // create new order
 router.post(
   "/create-order",
@@ -45,56 +45,34 @@ router.post(
       const pdfDoc = new PDFDocument();
       const pdfFilePath = `bill_${Date.now()}.pdf`;
       pdfDoc.pipe(fs.createWriteStream(pdfFilePath));
+      pdfDoc.fontSize(12).text('Bill of Purchase\n\n');
 
-
-      pdfDoc.fontSize(12);
-      pdfDoc.font('Helvetica-Bold').text('Bill of Purchase', { align: 'center' }).font('Helvetica');
-      pdfDoc.moveDown();
-
-      // Add order details
+      // Add bill details based on the order data
       for (const order of orders) {
-        pdfDoc.font('Helvetica-Bold').text(`Order ID: ${order._id}`).font('Helvetica');
-        pdfDoc.text(`Shipping Address: ${shippingAddress.address1}, ${shippingAddress.address2}, ${shippingAddress.zipCode}, ${shippingAddress.city}, ${shippingAddress.country}`);
+        pdfDoc.text(`Order ID: ${order._id}`);
+        pdfDoc.text(`Shipping Address: ${shippingAddress.street}, ${shippingAddress.city}, ${shippingAddress.state}`);
         pdfDoc.text(`Total Price: ${totalPrice}`);
-        pdfDoc.moveDown();
+        pdfDoc.text('\nProducts:');
 
-        // Add products as a table
-        let tableTop = pdfDoc.y + 10; // Adjust top position
-        const tableBottom = pdfDoc.page.height - 50; // Adjust bottom position
-        const col1Start = 50; // Adjust left position for column 1
-        const col2Start = 250; // Adjust left position for column 2
-        const col3Start = 400; // Adjust left position for column 3
-
-        // Draw table headers
-        pdfDoc.font('Helvetica-Bold').text('Product', col1Start, tableTop);
-        pdfDoc.font('Helvetica-Bold').text('Quantity', col2Start, tableTop);
-        pdfDoc.font('Helvetica-Bold').text('Price', col3Start, tableTop);
-
-        // Move down cursor
-        pdfDoc.moveDown();
-
-        // Iterate through each product
+        // Create table headers
+        pdfDoc.font('Helvetica-Bold').text('Name', { width: 200, align: 'left' });
+        pdfDoc.text('Quantity', { width: 100, align: 'left' });
+        pdfDoc.text('Original Price', { width: 100, align: 'left' });
+        pdfDoc.text('Discount Price', { width: 100, align: 'left' });
+      
+        // Add cart items to the table
         for (const item of order.cart) {
-          // Move down cursor and check if there's enough space for the next row
-          if (pdfDoc.y >= tableBottom) {
-            pdfDoc.addPage(); // Add a new page if there's not enough space
-            tableTop = 50; // Adjust top position for new page
-          }
-
-          // Draw product details
-          pdfDoc.text(item.name, col1Start, pdfDoc.y);
-          pdfDoc.text(item.quantity !== undefined ? item.quantity.toString() : '', col2Start, pdfDoc.y);
-          pdfDoc.text(item.price !== undefined ? item.price.toString() : '', col3Start, pdfDoc.y);
-
-          // Move down cursor
+          pdfDoc.font('Helvetica').text(item.name, { width: 200, align: 'right' });
+          pdfDoc.text(item.qty, { width: 100, align: 'right' });
+          pdfDoc.text(item.originalPrice, { width: 100, align: 'right' });
+          pdfDoc.text(item.discountPrice, { width: 100, align: 'right' });
           pdfDoc.moveDown();
         }
 
-        pdfDoc.moveDown();
+        pdfDoc.text('\n');
       }
 
       pdfDoc.end();
-
 
       // Send confirmation email with pdf
       const transporter = nodemailer.createTransport({
