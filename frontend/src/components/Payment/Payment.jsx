@@ -19,6 +19,11 @@ import { RxCross1 } from "react-icons/rx";
 
 const Payment = () => {
   const [orderData, setOrderData] = useState([]);
+  const [ewallet, setEwallet] = useState([]);
+  const [ewalletMoney, setEwalletMoney] = useState(null);
+  const [cutewalletMoney, setCutEwalletMoney] = useState(0);
+  const [remainingMoney, setRemainingMoney] = useState(0);
+  const [totalPrice, setTotalPrice] = useState();
   const [open, setOpen] = useState(false);
   const { user } = useSelector((state) => state.user);
   const navigate = useNavigate();
@@ -28,7 +33,26 @@ const Payment = () => {
   useEffect(() => {
     const orderData = JSON.parse(localStorage.getItem("latestOrder"));
     setOrderData(orderData);
-  }, []);
+    console.log("cutewalletMoney updated: ", cutewalletMoney);
+    console.log("remain updated: ", remainingMoney);
+    axios
+      .get(
+        `${server}/ewallet/get-Ewallets`, {
+        withCredentials: true,
+      })
+      .then((res) => {
+        setEwallet(res.data.EwalletData);
+        const userEwallet = res.data.EwalletData.find((value) => user && user._id === value.userId);
+        if (userEwallet) {
+          setEwalletMoney(userEwallet.amount);
+        }
+      })
+      .catch((error) => {
+        toast.error(error);
+      });
+  }, [ewalletMoney,cutewalletMoney,remainingMoney]);
+
+
 
   const createOrder = (data, actions) => {
     return actions.order
@@ -52,12 +76,56 @@ const Payment = () => {
       });
   };
 
-  
+  const handleEwallet = async (e) => {
+    e.preventDefault();
+
+    if (orderData.totalPrice > ewalletMoney) {
+      orderData.totalPrice = orderData.totalPrice - ewalletMoney;
+      setRemainingMoney(0);
+      setCutEwalletMoney(ewalletMoney);
+      setTotalPrice(orderData.totalPrice.toFixed(2));
+
+      console.log("hello",remainingMoney);
+      await axios
+      .put(`${server}/ewallet/update-Ewallets/${orderData.user._id}/${remainingMoney}`, {
+        // remainingMoney: remainingMoney
+      })
+      .then((res) => {
+        console.log(res.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      }); 
+      
+    } 
+    else {
+      let remainingMoney = 0;
+      remainingMoney = ewalletMoney - orderData.totalPrice;
+      setCutEwalletMoney(orderData.totalPrice);
+      console.log("cutewalletMoney : ",cutewalletMoney);
+      setRemainingMoney(remainingMoney.toFixed(2));
+      setTotalPrice(0);
+
+      await axios
+      .put(`${server}/ewallet/update-Ewallets/${orderData.user._id}/${remainingMoney}`, {
+      
+      })
+      .then((res) => {
+        console.log(res.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      }); 
+    }
+      
+  }
+
+
   const order = {
     cart: orderData?.cart,
     shippingAddress: orderData?.shippingAddress,
     user: user && user,
-    totalPrice: orderData?.totalPrice,
+    totalPrice: totalPrice,
   };
 
   // for paypal
@@ -229,7 +297,7 @@ const Payment = () => {
           />
         </div>
         <div className="w-full 800px:w-[35%] 800px:mt-0 mt-8">
-          <CartData orderData={orderData} />
+          <CartData orderData={orderData} handleEwallet={handleEwallet} totalPrice={totalPrice} cutewalletMoney={cutewalletMoney}/>
         </div>
       </div>
     </div>
@@ -448,8 +516,11 @@ const PaymentInfo = ({
   );
 };
 
-const CartData = ({ orderData }) => {
+const CartData = ({ orderData, handleEwallet, totalPrice, cutewalletMoney }) => {
+
+
   const shipping = orderData?.shipping?.toFixed(2);
+
   return (
     <div className="w-full bg-[#fff] rounded-md p-5 pb-8">
       <div className="flex justify-between">
@@ -462,17 +533,34 @@ const CartData = ({ orderData }) => {
         <h5 className="text-[18px] font-[600]">${shipping}</h5>
       </div>
       <br />
-      <div className="flex justify-between border-b pb-3">
+      <div className="flex justify-between pb-5">
         <h3 className="text-[16px] font-[400] text-[#000000a4]">Discount:</h3>
         <h5 className="text-[18px] font-[600]">{orderData?.discountPrice ? "$" + orderData.discountPrice : "-"}</h5>
       </div>
+      {cutewalletMoney ? 
+      (<>
+        <div className="flex justify-between border-b pb-3 mt-1">
+          <h3 className="text-[16px] font-[400] text-[#000000a4]">E-wallet Money:</h3>
+          <h5 className="text-[18px] font-[600]">{cutewalletMoney}</h5>
+        </div>
+      </>) 
+      : 
+      (<></>)}
+
       <h5 className="text-[18px] font-[600] text-end pt-3">
-        ${orderData?.totalPrice}
+        {totalPrice == 0 || totalPrice ? totalPrice : orderData?.totalPrice}
       </h5>
       <br />
-    <div>
-      <p>e-wallet</p>
-    </div>
+      <div>
+        <form onSubmit={handleEwallet}>
+          <input
+            className={`w-full h-[40px] border border-[#f63b60] text-center text-[#f63b60] rounded-[3px] mt-8 cursor-pointer`}
+            required
+            value="Use Your E-wallet money"
+            type="submit"
+          />
+        </form>
+      </div>
     </div>
   );
 };

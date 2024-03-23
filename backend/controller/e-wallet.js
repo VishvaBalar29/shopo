@@ -14,10 +14,28 @@ router.get(
   catchAsyncErrors(async (req, res, next) => {
     try {
       const EwalletData = await Ewallet.find();
-
+      
       res.status(201).json({
         success: true,
         EwalletData,
+      });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  })
+);
+
+router.put(
+  "/update-Ewallets/:id/:money",
+  catchAsyncErrors(async (req, res, next) => {
+    try {
+      const id = req.params.id;
+      const remainingMoney = req.params.money;
+      const data = await Ewallet.findOne({userId:id});
+      const updateData = await Ewallet.updateOne({userId:id},{$set:{amount:remainingMoney}});
+      res.status(201).json({
+        success: true,
+        money : updateData
       });
     } catch (error) {
       return next(new ErrorHandler(error.message, 500));

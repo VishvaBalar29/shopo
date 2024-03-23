@@ -265,15 +265,23 @@ router.put(
       }
 
       order.status = req.body.status;
-
       await order.save();
-      const ewalletData = await Ewallet.create({
-        orderId:order._id,
-        userId:order.user._id,
-        username:order.user.name,
-        amount:order.totalPrice
-      });
-      console.log(ewalletData);
+
+      const checkEwallet = await Ewallet.findOne({userId:order.user._id})
+      if(checkEwallet){
+        const money = (checkEwallet.amount + order.totalPrice).toFixed(2);
+        await Ewallet.updateOne({userId:order.user._id},{$set:{amount:money}});
+      }
+      else{
+        const ewalletData = await Ewallet.create({
+          orderId:order._id,
+          userId:order.user._id,
+          username:order.user.name,
+          amount:order.totalPrice
+        });
+        console.log(ewalletData);
+      }
+      
 
       res.status(200).json({
         success: true,
