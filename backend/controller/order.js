@@ -42,52 +42,59 @@ router.post(
         orders.push(order);
       }
 
-      // Generate PDF for bill
-      // const pdfDoc = new PDFDocument();
-      // const pdfFilePath = `bill_${Date.now()}.pdf`;
-      // pdfDoc.pipe(fs.createWriteStream(pdfFilePath));
-      // pdfDoc.fontSize(12).text('Bill of Purchase\n\n');
-      // for (const order of orders) {
-      //   pdfDoc.text(`Order ID: ${order._id}`);
-      //   pdfDoc.text(`Shipping Address: ${shippingAddress}`);
-      //   pdfDoc.text(`Total Price: ${totalPrice}`);
-      //   pdfDoc.text('\nProducts:');
-      //   console.log(order.cart);
-      //   order.cart.forEach(items => {
-      //     console.log(`Processing item: ${items.name} (Qty: ${items.quantity}, Price: ${items.price})`);
-      //     pdfDoc.text(`- ${items.name} (Qty: ${items.quantity}, Price: ${items.price})`);
-      //   });
-      //   pdfDoc.text('\n');
-      // }
-      // pdfDoc.end();
-
       const pdfDoc = new PDFDocument();
       const pdfFilePath = `bill_${Date.now()}.pdf`;
       pdfDoc.pipe(fs.createWriteStream(pdfFilePath));
 
-      // Set up PDF formatting
+
       pdfDoc.fontSize(12);
       pdfDoc.font('Helvetica-Bold').text('Bill of Purchase', { align: 'center' }).font('Helvetica');
       pdfDoc.moveDown();
-      
+
       // Add order details
       for (const order of orders) {
         pdfDoc.font('Helvetica-Bold').text(`Order ID: ${order._id}`).font('Helvetica');
         pdfDoc.text(`Shipping Address: ${shippingAddress.address1}, ${shippingAddress.address2}, ${shippingAddress.zipCode}, ${shippingAddress.city}, ${shippingAddress.country}`);
         pdfDoc.text(`Total Price: ${totalPrice}`);
         pdfDoc.moveDown();
-        
-        // Add products
-        pdfDoc.font('Helvetica-Bold').text('Products').font('Helvetica');
+
+        // Add products as a table
+        let tableTop = pdfDoc.y + 10; // Adjust top position
+        const tableBottom = pdfDoc.page.height - 50; // Adjust bottom position
+        const col1Start = 50; // Adjust left position for column 1
+        const col2Start = 250; // Adjust left position for column 2
+        const col3Start = 400; // Adjust left position for column 3
+
+        // Draw table headers
+        pdfDoc.font('Helvetica-Bold').text('Product', col1Start, tableTop);
+        pdfDoc.font('Helvetica-Bold').text('Quantity', col2Start, tableTop);
+        pdfDoc.font('Helvetica-Bold').text('Price', col3Start, tableTop);
+
+        // Move down cursor
+        pdfDoc.moveDown();
+
+        // Iterate through each product
         for (const item of order.cart) {
-          console.log(item);
-          console.log(`Processing item: ${item.name} (Qty: ${item.quantity}, Price: ${item.price})`);
-          pdfDoc.text(`- ${item.name} (Qty: ${item.quantity}, Price: ${item.price})`);
+          // Move down cursor and check if there's enough space for the next row
+          if (pdfDoc.y >= tableBottom) {
+            pdfDoc.addPage(); // Add a new page if there's not enough space
+            tableTop = 50; // Adjust top position for new page
+          }
+
+          // Draw product details
+          pdfDoc.text(item.name, col1Start, pdfDoc.y);
+          pdfDoc.text(item.quantity !== undefined ? item.quantity.toString() : '', col2Start, pdfDoc.y);
+          pdfDoc.text(item.price !== undefined ? item.price.toString() : '', col3Start, pdfDoc.y);
+
+          // Move down cursor
+          pdfDoc.moveDown();
         }
+
         pdfDoc.moveDown();
       }
 
       pdfDoc.end();
+
 
       // Send confirmation email with pdf
       const transporter = nodemailer.createTransport({
@@ -237,7 +244,7 @@ router.put(
 
       order.status = req.body.status;
 
-      
+
       await order.save({ validateBeforeSave: false });
 
 
@@ -267,21 +274,21 @@ router.put(
       order.status = req.body.status;
       await order.save();
 
-      const checkEwallet = await Ewallet.findOne({userId:order.user._id})
-      if(checkEwallet){
+      const checkEwallet = await Ewallet.findOne({ userId: order.user._id })
+      if (checkEwallet) {
         const money = (checkEwallet.amount + order.totalPrice).toFixed(2);
-        await Ewallet.updateOne({userId:order.user._id},{$set:{amount:money}});
+        await Ewallet.updateOne({ userId: order.user._id }, { $set: { amount: money } });
       }
-      else{
+      else {
         const ewalletData = await Ewallet.create({
-          orderId:order._id,
-          userId:order.user._id,
-          username:order.user.name,
-          amount:order.totalPrice
+          orderId: order._id,
+          userId: order.user._id,
+          username: order.user.name,
+          amount: order.totalPrice
         });
         console.log(ewalletData);
       }
-      
+
 
       res.status(200).json({
         success: true,
