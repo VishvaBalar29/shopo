@@ -378,6 +378,8 @@ const TrackOrder = () => {
   const { orders } = useSelector((state) => state.order);
   const dispatch = useDispatch();
 
+  console.log(user);
+  
   useEffect(() => {
     dispatch(getAllOrdersOfUser(user._id));
   }, []);
