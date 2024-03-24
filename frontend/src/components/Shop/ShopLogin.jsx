@@ -124,7 +124,7 @@ const ShopLogin = () => {
                 )}
               </div>
             </div>
-            <div className={`${styles.noramlFlex} justify-between`}>
+            {/* <div className={`${styles.noramlFlex} justify-between`}>
               <div className={`${styles.noramlFlex}`}>
                 <input
                   type="checkbox"
@@ -147,7 +147,7 @@ const ShopLogin = () => {
                   Forgot your password?
                 </a>
               </div>
-            </div>
+            </div> */}
             <div>
               <button
                 type="submit"
