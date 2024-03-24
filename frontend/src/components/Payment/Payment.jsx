@@ -442,9 +442,9 @@ const PaymentInfo = ({
       <br />
       {/* paypal payment */}
       <div>
-        <div className="flex w-full pb-5 border-b mb-2">
+        {/* <div className="flex w-full pb-5 border-b mb-2">
           <div
-            className="w-[25px] h-[25px] rounded-full bg-transparent border-[3px] border-[#1d1a1ab4] relative flex items-center justify-center"
+            
             onClick={() => setSelect(2)}
           >
             {select === 2 ? (
@@ -454,17 +454,17 @@ const PaymentInfo = ({
           <h4 className="text-[18px] pl-2 font-[600] text-[#000000b1]">
             Pay with Paypal
           </h4>
-        </div>
+        </div> */}
 
         {/* pay with payement */}
         {select === 2 ? (
-          <div className="w-full flex border-b">
-            <div
+          {/* <div className="w-full flex border-b">
+             <div
               className={`${styles.button} !bg-[#f63b60] text-white h-[45px] rounded-[5px] cursor-pointer text-[18px] font-[600]`}
               onClick={() => setOpen(true)}
             >
               Pay Now
-            </div>
+            </div> 
             {open && (
               <div className="w-full fixed top-0 left-0 bg-[#00000039] h-screen flex items-center justify-center z-[99999]">
                 <div className="w-full 800px:w-[40%] h-screen 800px:h-[80vh] bg-white rounded-[5px] shadow flex flex-col justify-center p-8 relative overflow-y-scroll">
@@ -490,14 +490,14 @@ const PaymentInfo = ({
                 </div>
               </div>
             )}
-          </div>
+          </div> */}
         ) : null}
       </div>
 
       <br />
       {/* cash on delivery */}
       <div>
-        <div className="flex w-full pb-5 border-b mb-2">
+        <div className="flex w-full pb-5 border-b mb-2" style={{marginTop: '-2rem'}}>
           <div
             className="w-[25px] h-[25px] rounded-full bg-transparent border-[3px] border-[#1d1a1ab4] relative flex items-center justify-center"
             onClick={() => setSelect(3)}
@@ -537,17 +537,17 @@ const CartData = ({ orderData, handleEwallet, totalPrice, cutewalletMoney, value
     <div className="w-full bg-[#fff] rounded-md p-5 pb-8">
       <div className="flex justify-between">
         <h3 className="text-[16px] font-[400] text-[#000000a4]">subtotal:</h3>
-        <h5 className="text-[18px] font-[600]">${orderData?.subTotalPrice}</h5>
+        <h5 className="text-[18px] font-[600]">₹{orderData?.subTotalPrice}</h5>
       </div>
       <br />
       <div className="flex justify-between">
         <h3 className="text-[16px] font-[400] text-[#000000a4]">shipping:</h3>
-        <h5 className="text-[18px] font-[600]">${shipping}</h5>
+        <h5 className="text-[18px] font-[600]">₹{shipping}</h5>
       </div>
       <br />
       <div className="flex justify-between pb-5">
         <h3 className="text-[16px] font-[400] text-[#000000a4]">Discount:</h3>
-        <h5 className="text-[18px] font-[600]">{orderData?.discountPrice ? "$" + orderData.discountPrice : "-"}</h5>
+        <h5 className="text-[18px] font-[600]">{orderData?.discountPrice ? "₹" + orderData.discountPrice : "-"}</h5>
       </div>
       {cutewalletMoney ?
         (<>
