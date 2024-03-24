@@ -124,7 +124,7 @@ const ProfileContent = ({ active }) => {
           <div className="w-full px-5">
             <div className="mb-5 pb-5">
 
-              <p style={{fontSize:"29px",color:"black",fontWeight:"500"}}>Shopo Balance : <span style={{color:"#cc0f0f",fontWeight:700}}>₹ {ewalletMoney}</span></p>
+              <p style={{fontSize:"29px",color:"black",fontWeight:"500"}}>Shopo Balance : <span style={{color:"#cc0f0f",fontWeight:700}}>₹ {ewalletMoney.toFixed(2)}</span></p>
               
             </div>
             <form onSubmit={handleSubmit} aria-required={true}>

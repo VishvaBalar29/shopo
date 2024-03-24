@@ -24,6 +24,7 @@ const Payment = () => {
   const [cutewalletMoney, setCutEwalletMoney] = useState(0);
   const [remainingMoney, setRemainingMoney] = useState(0);
   const [totalPrice, setTotalPrice] = useState();
+  const [value, setValue] = useState("true");
   const [open, setOpen] = useState(false);
   const { user } = useSelector((state) => state.user);
   const navigate = useNavigate();
@@ -33,10 +34,10 @@ const Payment = () => {
   useEffect(() => {
     const orderData = JSON.parse(localStorage.getItem("latestOrder"));
     setOrderData(orderData);
-    console.log("cutewalletMoney updated: ", cutewalletMoney);
-    console.log("remain updated: ", remainingMoney);
-    setTotalPrice(orderData?.totalPrice)
-    console.log(totalPrice);
+    // console.log("cutewalletMoney updated: ", cutewalletMoney);
+    // console.log("remain updated: ", remainingMoney);
+    // setTotalPrice(orderData?.totalPrice)
+    // console.log("totalPriceee", totalPrice);
     axios
       .get(
         `${server}/ewallet/get-Ewallets`, {
@@ -47,12 +48,14 @@ const Payment = () => {
         const userEwallet = res.data.EwalletData.find((value) => user && user._id === value.userId);
         if (userEwallet) {
           setEwalletMoney(userEwallet.amount);
+        } else {
+          setEwalletMoney(0);
         }
       })
       .catch((error) => {
         toast.error(error);
       });
-  }, [totalPrice,ewalletMoney,cutewalletMoney,remainingMoney]);
+  }, [ewalletMoney, cutewalletMoney, remainingMoney]);
 
 
 
@@ -80,46 +83,52 @@ const Payment = () => {
 
   const handleEwallet = async (e) => {
     e.preventDefault();
-
-    if (orderData.totalPrice > ewalletMoney) {
-      orderData.totalPrice = orderData.totalPrice - ewalletMoney;
-      setRemainingMoney(0);
-      setCutEwalletMoney(ewalletMoney);
-      setTotalPrice(orderData.totalPrice.toFixed(2));
-
-      console.log("hello",remainingMoney);
-      await axios
-      .put(`${server}/ewallet/update-Ewallets/${orderData.user._id}/${remainingMoney}`, {
-        // remainingMoney: remainingMoney
-      })
-      .then((res) => {
-        console.log(res.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      }); 
-      
-    } 
-    else {
-      let remainingMoney = 0;
-      remainingMoney = ewalletMoney - orderData.totalPrice;
-      setCutEwalletMoney(orderData.totalPrice);
-      console.log("cutewalletMoney : ",cutewalletMoney);
-      setRemainingMoney(remainingMoney.toFixed(2));
-      setTotalPrice(0);
-
-      await axios
-      .put(`${server}/ewallet/update-Ewallets/${orderData.user._id}/${remainingMoney}`, {
-      
-      })
-      .then((res) => {
-        console.log(res.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      }); 
+    setTotalPrice(orderData?.totalPrice)
+    if (ewalletMoney == 0) {
+      toast.error("Balance unavailable");
+      return;
     }
-      
+    if (value == "true") {
+      setValue("false");
+      if (orderData.totalPrice > ewalletMoney) {
+        const amount = orderData.totalPrice - ewalletMoney;
+        setRemainingMoney(0);
+        setCutEwalletMoney(ewalletMoney);
+        setTotalPrice(amount.toFixed(2));
+        // setValue((orderData.totalPrice - ewalletMoney).toFixed(2));
+        // console.log("value : ",value);
+        await axios
+          .put(`${server}/ewallet/update-Ewallets/${orderData.user._id}/${remainingMoney}`, {
+            // remainingMoney: remainingMoney
+          })
+          .then((res) => {
+            console.log(res.data);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
+      else {
+        let remainingMoney = 0;
+        remainingMoney = ewalletMoney - orderData.totalPrice;
+        setCutEwalletMoney(orderData.totalPrice);
+        // console.log("cutewalletMoney : ", cutewalletMoney);
+        setRemainingMoney(remainingMoney.toFixed(2));
+        setTotalPrice(0);
+        setValue("0");
+        await axios
+          .put(`${server}/ewallet/update-Ewallets/${orderData.user._id}/${remainingMoney}`, {
+
+          })
+          .then((res) => {
+            console.log(res.data);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
+    }
+
   }
 
 
@@ -127,7 +136,8 @@ const Payment = () => {
     cart: orderData?.cart,
     shippingAddress: orderData?.shippingAddress,
     user: user && user,
-    totalPrice: totalPrice,
+    totalPrice: totalPrice == 0 || totalPrice ? totalPrice : orderData?.totalPrice,
+    // totalPrice: value == "0" ? 0 : totalPrice,
   };
 
   // for paypal
@@ -299,7 +309,7 @@ const Payment = () => {
           />
         </div>
         <div className="w-full 800px:w-[35%] 800px:mt-0 mt-8">
-          <CartData orderData={orderData} handleEwallet={handleEwallet} totalPrice={totalPrice} cutewalletMoney={cutewalletMoney}/>
+          <CartData orderData={orderData} handleEwallet={handleEwallet} totalPrice={totalPrice} cutewalletMoney={cutewalletMoney} value={value}/>
         </div>
       </div>
     </div>
@@ -518,9 +528,9 @@ const PaymentInfo = ({
   );
 };
 
-const CartData = ({ orderData, handleEwallet, totalPrice, cutewalletMoney }) => {
+const CartData = ({ orderData, handleEwallet, totalPrice, cutewalletMoney, value }) => {
 
-
+  console.log("cart Total Price : ",totalPrice);
   const shipping = orderData?.shipping?.toFixed(2);
 
   return (
@@ -539,18 +549,20 @@ const CartData = ({ orderData, handleEwallet, totalPrice, cutewalletMoney }) => 
         <h3 className="text-[16px] font-[400] text-[#000000a4]">Discount:</h3>
         <h5 className="text-[18px] font-[600]">{orderData?.discountPrice ? "$" + orderData.discountPrice : "-"}</h5>
       </div>
-      {cutewalletMoney ? 
-      (<>
-        <div className="flex justify-between border-b pb-3 mt-1">
-          <h3 className="text-[16px] font-[400] text-[#000000a4]">E-wallet Money:</h3>
-          <h5 className="text-[18px] font-[600]">{cutewalletMoney}</h5>
-        </div>
-      </>) 
-      : 
-      (<></>)}
+      {cutewalletMoney ?
+        (<>
+          <div className="flex justify-between border-b pb-3 mt-1">
+            <h3 className="text-[16px] font-[400] text-[#000000a4]">E-wallet Money:</h3>
+            <h5 className="text-[18px] font-[600]">₹ {cutewalletMoney}</h5>
+          </div>
+        </>)
+        :
+        (<></>)}
 
       <h5 className="text-[18px] font-[600] text-end pt-3">
         {totalPrice == 0 || totalPrice ? totalPrice : orderData?.totalPrice}
+        {/* {totalPrice} */}
+        {/* {value == "0" ? (<>₹ 0</>) : (<>₹ {totalPrice}</>)} */}
       </h5>
       <br />
       <div>
