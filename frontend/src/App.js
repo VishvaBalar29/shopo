@@ -5,6 +5,8 @@ import {
   LoginPage,
   SignupPage,
   ActivationPage,
+  ForgotPassword,
+  ResetPassword,
   HomePage,
   ProductsPage,
   BestSellingPage,
@@ -100,6 +102,8 @@ const App = () => {
           path="/activation/:activation_token"
           element={<ActivationPage />}
         />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:id/:token" element={<ResetPassword/>}/>
         <Route
           path="/seller/activation/:activation_token"
           element={<SellerActivationPage />}

@@ -1,6 +1,8 @@
 import LoginPage from "../pages/Login";
 import SignupPage from "../pages/SignupPage";
 import ActivationPage from "../pages/ActivationPage";
+import ForgotPassword from "../pages/ForgotPassword.jsx";
+import ResetPassword from "../pages/ResetPassword.jsx";
 import HomePage from "../pages/HomePage";
 import ProductsPage from "../pages/ProductsPage";
 import BestSellingPage from "../pages/BestSellingPage";
@@ -18,10 +20,12 @@ import OrderDetailsPage from "../pages/OrderDetailsPage";
 import TrackOrderPage from "../pages/TrackOrderPage";
 import UserInbox from "../pages/UserInbox.jsx";
 
-export { 
+export {
     LoginPage,
     SignupPage,
     ActivationPage,
+    ForgotPassword,
+    ResetPassword,
     HomePage,
     ProductsPage,
     BestSellingPage,

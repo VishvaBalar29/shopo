@@ -47,30 +47,29 @@ router.post(
       pdfDoc.pipe(fs.createWriteStream(pdfFilePath));
       pdfDoc.fontSize(12).text('Bill of Purchase\n\n');
 
+      console.log(orders);
       // Add bill details based on the order data
+      pdfDoc.text(`Order ID: ${orders[0]._id}`);
+      pdfDoc.text(`Shipping Address: ${shippingAddress.address1}, ${shippingAddress.address2}, ${shippingAddress.zipCode},${shippingAddress.city},${shippingAddress.country}`);
+      pdfDoc.text('\nProducts:');
+      let total_amt = 0;
       for (const order of orders) {
-        pdfDoc.text(`Order ID: ${order._id}`);
-        pdfDoc.text(`Shipping Address: ${shippingAddress.street}, ${shippingAddress.city}, ${shippingAddress.state}`);
-        pdfDoc.text(`Total Price: ${totalPrice}`);
-        pdfDoc.text('\nProducts:');
 
-        // Create table headers
-        pdfDoc.font('Helvetica-Bold').text('Name', { width: 200, align: 'left' });
-        pdfDoc.text('Quantity', { width: 100, align: 'left' });
-        pdfDoc.text('Original Price', { width: 100, align: 'left' });
-        pdfDoc.text('Discount Price', { width: 100, align: 'left' });
-      
-        // Add cart items to the table
         for (const item of order.cart) {
-          pdfDoc.font('Helvetica').text(item.name, { width: 200, align: 'right' });
-          pdfDoc.text(item.qty, { width: 100, align: 'right' });
-          pdfDoc.text(item.originalPrice, { width: 100, align: 'right' });
-          pdfDoc.text(item.discountPrice, { width: 100, align: 'right' });
+          pdfDoc.font('Helvetica-Bold').text(`Name  :    ${item.name}`, { align: 'left' });
+          pdfDoc.text(`Quantity  :   ${item.qty}`, {  align: 'left' });
+          pdfDoc.text(`Original Price  :   ${item.originalPrice}`, { align: 'left' });
+          pdfDoc.text(`Discount Price   :   ${item.discountPrice}`, { align: 'left' });
+          total_amt = total_amt + item.discountPrice;
           pdfDoc.moveDown();
         }
-
         pdfDoc.text('\n');
       }
+      shipping_charge = total_amt * 10 / 100;
+      pdfDoc.text(`Price: ${total_amt}`,{ align: 'right' });
+      pdfDoc.text(`Shipping Charges : ${shipping_charge}`,{ align: 'right' });
+      pdfDoc.text(`Total Price : ${totalPrice}`,{ align: 'right' });
+    
 
       pdfDoc.end();
 
@@ -199,7 +198,7 @@ router.put(
       async function updateSellerInfo(amount) {
         const seller = await Shop.findById(req.seller.id);
 
-        seller.availableBalance += amount;
+        seller.availableBalance = amount;
 
         await seller.save();
       }

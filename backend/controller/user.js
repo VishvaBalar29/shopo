@@ -1,4 +1,3 @@
-
 const express = require("express");
 const User = require("../model/user");
 const router = express.Router();
@@ -9,6 +8,8 @@ const jwt = require("jsonwebtoken");
 const sendMail = require("../utils/sendMail");
 const sendToken = require("../utils/jwtToken");
 const { isAuthenticated, isAdmin } = require("../middleware/auth");
+const nodemailer = require('nodemailer');
+const bcrypt = require("bcryptjs");
 
 // create user
 router.post("/create-user", async (req, res, next) => {
@@ -154,6 +155,70 @@ router.get(
     }
   })
 );
+
+router.post(
+  "/forgot-password",
+  catchAsyncErrors(async(req,res,next)=>{
+    try {
+      const { email } = req.body;
+      console.log("forgot",email);
+      const checkEmail = await User.findOne({ email })
+        if (!checkEmail) {
+            res.status(400).send({ msg: "Email is not exist" })
+            return;
+        }
+        else{
+          console.log("hello");
+        }
+        const token = jwt.sign({ id: checkEmail._id }, "jwt_secret_key", { expiresIn: "1d" })
+        var transporter = nodemailer.createTransport({
+          service: 'gmail',
+          auth: {
+              user: 'vishubalar29@gmail.com',
+              pass: 'ygan kqli khki dyze'
+          }
+      });
+
+      var mailOptions = {
+          from: 'vishubalar29@gmail.com',
+          to: email,
+          subject: 'Reset Password Link',
+          text: `http://localhost:3000/reset-password/${checkEmail._id}/${token}`
+      };
+
+      transporter.sendMail(mailOptions, function (error, info) {
+          if (error) {
+              console.log(error);
+          } else {
+              return res.send({ Status: "Success" })
+          }
+      })
+    } catch (error) {
+      
+    }
+  })
+)
+
+router.post(
+ "/reset-password/:id/:token" ,
+ catchAsyncErrors(async(req,res,next)=>{
+  const { id, token } = req.params;
+    const { password } = req.body;
+    jwt.verify(token, "jwt_secret_key", (err, decoded) => {
+      if (err) {
+          return res.json({ message: `token error from reser-password API : ${err}` })
+      } else {
+          bcrypt.hash(password, 10)
+              .then(hash => {
+                  User.findByIdAndUpdate({ _id: id }, { password: hash })
+                      .then(u => res.send({ message: "Password Updated" }))
+                      .catch(err => res.send({ message: `error from reser-password API : ${err}` }))
+              })
+              .catch(err => res.send({ Status: err }))
+      }
+  })
+ })
+)
 
 // log out user
 router.get(
