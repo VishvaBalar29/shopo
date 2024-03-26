@@ -174,7 +174,7 @@ const WithdrawMoney = () => {
                   </div>
                   <div className="pt-2">
                     <label>
-                      Bank Swift Code <span className="text-red-500">*</span>
+                      Bank IFSC Code <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
@@ -188,7 +188,7 @@ const WithdrawMoney = () => {
                           bankSwiftCode: e.target.value,
                         })
                       }
-                      placeholder="Enter your Bank Swift Code!"
+                      placeholder="Enter your Bank IFSC Code!"
                       className={`${styles.input} mt-2`}
                     />
                   </div>
