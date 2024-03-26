@@ -17,11 +17,11 @@ const Hero = () => {
         >
           Best Collection for <br /> home Decoration
         </h1>
+        <p className="pt-5 text-[19px] font-[Poppins] font-[600] text-[#000000ba]">Welcome to SHOPO...
+
+</p>
         <p className="pt-5 text-[16px] font-[Poppins] font-[400] text-[#000000ba]">
-          Lorem ipsum dolor sit amet consectetur, adipisicing elit. Beatae,
-          assumenda? Quisquam itaque <br /> exercitationem labore vel, dolore
-          quidem asperiores, laudantium temporibus soluta optio consequatur{" "}
-          <br /> aliquam deserunt officia. Dolorum saepe nulla provident.
+        Indulge in an unparalleled shopping experience with SHOPO. Discover a curated selection of premium products spanning across fashion, electronics, home essentials, beauty, and beyond. With our commitment to quality, convenience, and customer satisfaction, we're your ultimate destination for all your shopping needs. Shop with confidence knowing that every purchase is backed by our dedication to excellence and backed by seamless delivery to your doorstep. Join us in redefining the art of online shopping. Start exploring now and elevate your lifestyle with SHOPO.
         </p>
         <Link to="/products" className="inline-block">
             <div className={`${styles.button} mt-5`}>

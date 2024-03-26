@@ -60,6 +60,8 @@ const EventCard = ({ active, data }) => {
       </div>
     </div>
   );
+
+  
 };
 
 export default EventCard;
