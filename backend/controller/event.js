@@ -88,31 +88,27 @@ router.get(
 // delete event of a shop
 router.delete(
   "/delete-shop-event/:id",
+  isSeller,
   catchAsyncErrors(async (req, res, next) => {
     try {
       const id = req.params.id;
-      const event = await Event.findOne({_id:req.params.id});
-
-
-      // if (!product) {
-      //   return next(new ErrorHandler("Product is not found with this id", 404));
-      // }    
+      const event = await Event.findById(req.params.id);   
       if (!event) {
           return next(new ErrorHandler("Event is not found with this id", 404));
-        }  
-      await event.remove();
+      }  
 
-      for (let i = 0; 1 < product.images.length; i++) {
+      for (let i = 0; 1 < event.images.length; i++) {
         const result = await cloudinary.v2.uploader.destroy(
           event.images[i].public_id
         );
       }
-    
-
-      res.status(201).json({
-        success: true,
-        message: "Event Deleted successfully!",
-      });
+      const delEvent = await Event.deleteOne({_id : id});
+      if(delEvent){
+        res.status(201).json({
+          success: true,
+          message: "Event Deleted successfully!",
+        });
+      }
     } catch (error) {
       return next(new ErrorHandler(error, 400));
     }
