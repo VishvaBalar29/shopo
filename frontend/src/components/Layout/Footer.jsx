@@ -11,8 +11,12 @@ import {
   footerProductLinks,
   footerSupportLinks,
 } from "../../static/data";
+import { toast } from "react-toastify";
 
 const Footer = () => {
+  const setMessage = () => {
+    toast.success("You are Successfully Subscribed!");
+  }
   return (
     <div className="bg-[#000] text-white">
       <div className="md:flex md:justify-between md:items-center sm:px-12 px-4 bg-[#342ac8] py-7">
@@ -29,7 +33,7 @@ const Footer = () => {
             className="text-gray-800
                 sm:w-72 w-full sm:mr-5 mr-1 lg:mb-0 mb-4 py-2.5 rounded px-2 focus:outline-none"
           />
-          <button className="bg-[#56d879] hover:bg-teal-500 duration-300 px-5 py-2.5 rounded-md text-whie md:w-auto w-full">
+          <button className="bg-[#56d879] hover:bg-teal-500 duration-300 px-5 py-2.5 rounded-md text-whie md:w-auto w-full" onClick={() => setMessage()}>
             Submit
           </button>
         </div>
@@ -110,7 +114,7 @@ const Footer = () => {
         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10
          text-center pt-2 text-gray-400 text-sm pb-8"
       >
-        <span>© 2024 shopo. All rights reserved.</span>
+        <span>© 2020 shopo. All rights reserved.</span>
         <span>Terms · Privacy Policy</span>
         <div className="sm:block flex items-center justify-center w-full">
           <img

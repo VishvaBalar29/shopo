@@ -15,13 +15,10 @@ const Hero = () => {
         <h1
           className={`text-[35px] leading-[1.2] 800px:text-[60px] text-[#3d3a3a] font-[600] capitalize`}
         >
-          Best Collection for <br /> home Decoration
+          Find your all needs  <br /> at one place
         </h1>
-        <p className="pt-5 text-[19px] font-[Poppins] font-[600] text-[#000000ba]">Welcome to SHOPO...
-
-</p>
         <p className="pt-5 text-[16px] font-[Poppins] font-[400] text-[#000000ba]">
-        Indulge in an unparalleled shopping experience with SHOPO. Discover a curated selection of premium products spanning across fashion, electronics, home essentials, beauty, and beyond. With our commitment to quality, convenience, and customer satisfaction, we're your ultimate destination for all your shopping needs. Shop with confidence knowing that every purchase is backed by our dedication to excellence and backed by seamless delivery to your doorstep. Join us in redefining the art of online shopping. Start exploring now and elevate your lifestyle with SHOPO.
+        Welcome to SHOPO your ultimate destination for everything you need, just a click away. Whether you're searching for the latest gadgets, home essentials, fashion finds, or more, we've got you covered. With a vast array of products and unbeatable prices, shopping with us is not just convenient, it's a delight.
         </p>
         <Link to="/products" className="inline-block">
             <div className={`${styles.button} mt-5`}>
