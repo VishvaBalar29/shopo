@@ -15,9 +15,9 @@ const Hero = () => {
         <h1
           className={`text-[35px] leading-[1.2] 800px:text-[60px] text-[#3d3a3a] font-[600] capitalize`}
         >
-          Best Collection for <br /> home Decoration
+          Find Your All Needs<br /> At One Place
         </h1>
-        <p className="pt-5 text-[19px] font-[Poppins] font-[600] text-[#000000ba]">Welcome to SHOPO...
+        <p className="pt-5 text-[19px] font-[Poppins] font-[600] text-[#000000ba]">
 
 </p>
         <p className="pt-5 text-[16px] font-[Poppins] font-[400] text-[#000000ba]">

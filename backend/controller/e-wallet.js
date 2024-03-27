@@ -14,7 +14,7 @@ router.get(
   catchAsyncErrors(async (req, res, next) => {
     try {
       const EwalletData = await Ewallet.find();
-      
+
       res.status(201).json({
         success: true,
         EwalletData,
