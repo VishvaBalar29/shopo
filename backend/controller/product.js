@@ -206,9 +206,9 @@ router.post(
   catchAsyncErrors(async (req, res, next) => {
     try {
       const cat = req.body.category;
-      const checkCategory = await category.find({"title":cat});
-      if (!checkCategory) {
-        return next(new ErrorHandler("Category Id is invalid!", 400));
+      const checkCategory = await category.findOne({"title":cat});
+      if (checkCategory) {
+        return next(new ErrorHandler("Category already exists!", 400));
       } 
       else {
         const categoryData = await category.create({"title":cat});
