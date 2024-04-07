@@ -46,6 +46,7 @@ import {
   AdminDashboardOrders,
   AdminDashboardProducts,
   AdminDashboardEvents,
+  AddCategory,
   AdminDashboardWithdraw
 } from "./routes/AdminRoutes";
 import { ToastContainer } from "react-toastify";
@@ -304,14 +305,22 @@ const App = () => {
             </ProtectedAdminRoute>
           }
         />
-         <Route
-          path="/admin-events"
-          element={
-            <ProtectedAdminRoute>
-              <AdminDashboardEvents />
-            </ProtectedAdminRoute>
-          }
-        />
+          <Route
+            path="/admin-events"
+            element={
+              <ProtectedAdminRoute>
+                <AdminDashboardEvents />
+              </ProtectedAdminRoute>
+            }
+          />
+          <Route
+            path="/add-category"
+            element={
+              <ProtectedAdminRoute>
+                <AddCategory />
+              </ProtectedAdminRoute>
+            }
+          />
          <Route
           path="/admin-withdraw-request"
           element={

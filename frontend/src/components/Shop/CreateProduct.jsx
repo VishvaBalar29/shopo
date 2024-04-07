@@ -5,6 +5,9 @@ import { useNavigate } from "react-router-dom";
 import { createProduct } from "../../redux/actions/product";
 import { categoriesData } from "../../static/data";
 import { toast } from "react-toastify";
+import axios from "axios";
+import { server } from "../../server";
+
 
 const CreateProduct = () => {
   const { seller } = useSelector((state) => state.seller);
@@ -20,8 +23,23 @@ const CreateProduct = () => {
   const [originalPrice, setOriginalPrice] = useState();
   const [discountPrice, setDiscountPrice] = useState();
   const [stock, setStock] = useState();
+  const [categories, setCategories] = useState("");
 
   useEffect(() => {
+    console.log("hello");
+    axios
+      .get(
+        `${server}/product/get-category`, {
+        withCredentials: true,
+      })
+      .then((res) => {
+        console.log(res.data.categoryData);
+        setCategories(res.data.categoryData);
+        // console.log(coupon[0]);
+      })
+      .catch((error) => {
+        toast.error(error);
+      });
     if (error) {
       toast.error(error);
     }
@@ -127,8 +145,8 @@ const CreateProduct = () => {
             onChange={(e) => setCategory(e.target.value)}
           >
             <option value="Choose a category">Choose a category</option>
-            {categoriesData &&
-              categoriesData.map((i) => (
+            {categories &&
+              categories.map((i) => (
                 <option value={i.title} key={i.title}>
                   {i.title}
                 </option>

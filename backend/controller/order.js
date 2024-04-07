@@ -175,6 +175,9 @@ router.put(
       if (req.body.status === "Delivered") {
         order.deliveredAt = Date.now();
         order.paymentInfo.status = "Succeeded";
+        order.cart.forEach(async (o) => {
+          await updateOrder(o._id, o.qty);
+        });
         const serviceCharge = order.totalPrice * .10;
         await updateSellerInfo(order.totalPrice - serviceCharge);
       }

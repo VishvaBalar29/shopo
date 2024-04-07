@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import { categoriesData } from "../../static/data";
 import { toast } from "react-toastify";
 import { createevent } from "../../redux/actions/event";
+import axios from "axios";
+import { server } from "../../server";
 
 const CreateEvent = () => {
   const { seller } = useSelector((state) => state.seller);
@@ -22,6 +24,7 @@ const CreateEvent = () => {
   const [stock, setStock] = useState();
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
+  const [categories, setCategories] = useState("");
 
   const handleStartDateChange = (e) => {
     const startDate = new Date(e.target.value);
@@ -48,6 +51,21 @@ const CreateEvent = () => {
     : "";
 
   useEffect(() => {
+    // console.log("hello");
+    axios
+      .get(
+        `${server}/product/get-category`, {
+        withCredentials: true,
+      })
+      .then((res) => {
+        console.log(res.data.categoryData);
+        setCategories(res.data.categoryData);
+        // console.log(coupon[0]);
+      })
+      .catch((error) => {
+        toast.error(error);
+      });
+
     if (error) {
       toast.error(error);
     }
@@ -146,8 +164,8 @@ const CreateEvent = () => {
             onChange={(e) => setCategory(e.target.value)}
           >
             <option value="Choose a category">Choose a category</option>
-            {categoriesData &&
-              categoriesData.map((i) => (
+            {categories &&
+              categories.map((i) => (
                 <option value={i.title} key={i.title}>
                   {i.title}
                 </option>
