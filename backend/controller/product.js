@@ -5,6 +5,7 @@ const router = express.Router();
 const Product = require("../model/product");
 const Order = require("../model/order");
 const Shop = require("../model/shop");
+const category = require("../model/category");
 const cloudinary = require("cloudinary");
 const ErrorHandler = require("../utils/ErrorHandler");
 
@@ -199,4 +200,44 @@ router.get(
     }
   })
 );
+
+router.post(
+  "/add-category",
+  catchAsyncErrors(async (req, res, next) => {
+    try {
+      const cat = req.body.category;
+      const checkCategory = await category.find({"title":cat});
+      if (!checkCategory) {
+        return next(new ErrorHandler("Category Id is invalid!", 400));
+      } 
+      else {
+        const categoryData = await category.create({"title":cat});
+
+        res.status(201).json({
+          success: true,
+          categoryData,
+        });
+      }
+    } catch (error) {
+      return next(new ErrorHandler(error, 400));
+    }
+  })
+);
+
+router.get(
+  "/get-category",
+  catchAsyncErrors(async (req, res, next) => {
+    try {      
+        const categoryData = await category.find();
+
+        res.status(201).json({
+          success: true,
+          categoryData,
+        });
+    } catch (error) {
+      return next(new ErrorHandler(error, 400));
+    }
+  })
+);
+
 module.exports = router;
