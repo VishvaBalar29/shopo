@@ -65,7 +65,7 @@ router.post(
         }
         pdfDoc.text('\n');
       }
-      shipping_charge = total_amt * 10 / 100;
+      shipping_charge = total_amt * 2 / 100;
       pdfDoc.text(`Price: ${total_amt}`,{ align: 'right' });
       pdfDoc.text(`Shipping Charges : ${shipping_charge}`,{ align: 'right' });
       pdfDoc.text(`Total Price : ${totalPrice}`,{ align: 'right' });
