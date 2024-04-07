@@ -25,6 +25,7 @@ const AddCategory = () => {
             .then((res) => {
                 console.log(res);
                 toast.success("Category added successfully!");
+                setCategory("");
             })
             .catch((err) => {
                 toast.error(err.response.data.message);
