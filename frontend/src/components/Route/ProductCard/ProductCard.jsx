@@ -29,6 +29,7 @@ const ProductCard = ({ data, isEvent }) => {
   const [open, setOpen] = useState(false);
   const [coupon,setCoupon] = useState([]);
   const dispatch = useDispatch();
+  const [shopName, setShopName] = useState("");
 
   useEffect(() => {
     axios
@@ -49,7 +50,16 @@ const ProductCard = ({ data, isEvent }) => {
     } else {
       setClick(false);
     }
-  }, [wishlist]);
+    const fetchShopName = async () => {
+      try {
+        const response = await axios.get(`${server}/shop/get-shop-info/${data.shop._id}`);
+        setShopName(response.data.shop.name);
+      } catch (error) {
+        console.error("Error fetching shop data:", error);
+      }
+    };
+    fetchShopName();
+  }, [wishlist, shopName]);
 
   const removeFromWishlistHandler = (data) => {
     setClick(!click);
@@ -90,7 +100,7 @@ const ProductCard = ({ data, isEvent }) => {
         <div className="d-flex flex-row" style={{display:"flex"}}>
           <div className="">
             <Link to={`/shop/preview/${data?.shop._id}`}>
-              <h5 className={`${styles.shop_name}`}>{data.shop.name}</h5>
+              <h5 className={`${styles.shop_name}`}>{shopName}</h5>
             </Link>
           </div>
           {
